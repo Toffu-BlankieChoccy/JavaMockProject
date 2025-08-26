@@ -1,0 +1,85 @@
+package com.tofftran.mockproject.web.controller;
+
+import com.tofftran.mockproject.data.entity.User;
+import com.tofftran.mockproject.data.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/users")
+public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    //Read all users
+    @GetMapping
+    public String listUsers(Model model){
+        model.addAttribute("users", userService.findAllUsers());
+        return "user/list";
+    }
+
+    //Add form
+    @GetMapping("/add")
+    public String showAddForm(Model model){
+        model.addAttribute("user", new User());
+        return "user/add";
+    }
+
+    //Handle add form submission
+    @PostMapping
+    public String addUser(@Valid @ModelAttribute("user") User user, BindingResult result, Model model){
+        if (result.hasErrors()){
+            return "user/add";
+        }
+        try{
+            userService.createUser(user);
+            return "redirect:/users";
+        } catch (Exception e){
+            model.addAttribute("errorMessage", e.getMessage());
+            return "user/add";
+        }
+    }
+
+    //Edit form
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id, Model model){
+        User user = userService.findUserById(id);
+        model.addAttribute("user", user);
+        return "user/edit";
+    }
+
+    //Handle edit form submission
+    @PostMapping("/{id}")
+    public String updateUser(@PathVariable Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model){
+        if (result.hasErrors()){
+            return "user/edit";
+        }
+        try{
+            userService.updateUser(id, user);
+            return "redirect:/users";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "user/edit";
+        }
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable Long id, Model model){
+        try{
+            userService.deleteUser(id);
+            return "redirect:/users";
+        } catch (Exception e){
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("users", userService.findUserById(id));
+            return "user/list";
+        }
+    }
+
+
+}
