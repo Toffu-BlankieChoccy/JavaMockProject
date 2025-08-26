@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Borrowing List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>Borrowings</h1>
+    <a th:href="@{/borrowings/add}" class="btn btn-primary mb-3">Add New Borrowing</a>
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <span th:text="${errorMessage}"></span>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Book</th>
+            <th>User</th>
+            <th>Borrow Date</th>
+            <th>Return Date</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="borrowing : ${borrowings}">
+            <td th:text="${borrowing.id}"></td>
+            <td th:text="${borrowing.book.title}"></td>
+            <td th:text="${borrowing.user.name}"></td>
+            <td th:text="${borrowing.borrowDate}"></td>
+            <td th:text="${borrowing.returnDate}"></td>
+            <td>
+                <a th:href="@{/borrowings/edit/{id}(id=${borrowing.id})}" class="btn btn-sm btn-warning">Edit</a>
+                <a th:href="@{/borrowings/delete/{id}(id=${borrowing.id})}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

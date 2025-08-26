@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -42,6 +41,7 @@ public class Book {
     @PositiveOrZero(message = "Price must be a positive number")
     private double Price;
 
+    //@OneToMany(mappedBy = "templates/book", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Borrowing> borrowings = new ArrayList<>();
 

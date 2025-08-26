@@ -33,6 +33,8 @@ public class User {
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     private String phoneNumber;
 
+
+    //@OneToMany(mappedBy = "templates/user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Borrowing> borrowings = new ArrayList<>();
 }

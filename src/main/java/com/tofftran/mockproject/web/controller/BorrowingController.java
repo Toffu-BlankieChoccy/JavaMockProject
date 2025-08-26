@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/borrowings")  
+@RequestMapping("/borrowings")
 public class BorrowingController {
     private final BookService bookService;
     private final UserService userService;

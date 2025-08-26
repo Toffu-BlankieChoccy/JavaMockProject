@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Borrowing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>Edit Borrowing</h1>
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <span th:text="${errorMessage}"></span>
+    </div>
+    <form th:action="@{/borrowings/{id}(id=${borrowing.id})}" th:object="${borrowing}" method="post">
+        <div class="mb-3">
+            <label for="book" class="form-label">Book</label>
+            <select class="form-control" id="book" th:field="*{book.id}">
+                <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}"></option>
+            </select>
+            <div th:errors="*{book}" class="text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="user" class="form-label">User</label>
+            <select class="form-control" id="user" th:field="*{user.id}">
+                <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+            </select>
+            <div th:errors="*{user}" class="text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="borrowDate" class="form-label">Borrow Date</label>
+            <input type="date" class="form-control" id="borrowDate" th:field="*{borrowDate}">
+            <div th:errors="*{borrowDate}" class="text-danger"></div>
+        </div>
+        <div class="mb-3">
+            <label for="returnDate" class="form-label">Return Date</label>
+            <input type="date" class="form-control" id="returnDate" th:field="*{returnDate}">
+            <div th:errors="*{returnDate}" class="text-danger"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="@{/borrowings}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

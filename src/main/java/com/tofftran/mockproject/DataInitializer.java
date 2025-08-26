@@ -33,43 +33,43 @@ public class DataInitializer {
     CommandLineRunner init() {
         return args -> {
             // Test valid data
-            try {
-                Book book = new Book(null, "The Catcher in the Rye", "978-031676948", LocalDate.of(1951, 7, 16), 8.99, null);
-                bookRepository.save(book);
-                System.out.println("Saved valid book: " + book);
-
-                User user = new User(null, "Alice Johnson", "alice@example.com", "555123457", null);
-                userRepository.save(user);
-                System.out.println("Saved valid user: " + user);
-
-                Borrowing borrowing = new Borrowing(null, book, user, LocalDate.now(), null);
-                borrowingRepository.save(borrowing);
-                System.out.println("Saved valid borrowing: " + borrowing);
-            } catch (ConstraintViolationException e) {
-                System.out.println("Validation error: " + e.getMessage());
-            }
-
-            // Test invalid data
-            try {
-                Book invalidBook = new Book(null, "", "978-0316769488", null, -5.0, null); // Invalid title, publishedDate, price
-                bookRepository.save(invalidBook);
-            } catch (ConstraintViolationException e) {
-                System.out.println("Expected validation error for book: " + e.getMessage());
-            }
-
-            try {
-                User invalidUser = new User(null, "A", "invalid-email", null, null); // Invalid name, email
-                userRepository.save(invalidUser);
-            } catch (ConstraintViolationException e) {
-                System.out.println("Expected validation error for user: " + e.getMessage());
-            }
-
-            // Test delete book
-            try {
-                bookService.deleteBook(1L); // Book đang được mượn (returnDate=null)
-            } catch (ConflictException e) {
-                System.out.println("Expected conflict error: " + e.getMessage());
-            }
+//            try {
+//                Book book = new Book(null, "The Catcher in the Rye", "978-031676948", LocalDate.of(1951, 7, 16), 8.99, null);
+//                bookRepository.save(book);
+//                System.out.println("Saved valid book: " + book);
+//
+//                User user = new User(null, "Alice Johnson", "alice@example.com", "555123457", null);
+//                userRepository.save(user);
+//                System.out.println("Saved valid user: " + user);
+//
+//                Borrowing borrowing = new Borrowing(null, book, user, LocalDate.now(), null);
+//                borrowingRepository.save(borrowing);
+//                System.out.println("Saved valid borrowing: " + borrowing);
+//            } catch (ConstraintViolationException e) {
+//                System.out.println("Validation error: " + e.getMessage());
+//            }
+//
+//            // Test invalid data
+//            try {
+//                Book invalidBook = new Book(null, "", "978-0316769488", null, -5.0, null); // Invalid title, publishedDate, price
+//                bookRepository.save(invalidBook);
+//            } catch (ConstraintViolationException e) {
+//                System.out.println("Expected validation error for book: " + e.getMessage());
+//            }
+//
+//            try {
+//                User invalidUser = new User(null, "A", "invalid-email", null, null); // Invalid name, email
+//                userRepository.save(invalidUser);
+//            } catch (ConstraintViolationException e) {
+//                System.out.println("Expected validation error for user: " + e.getMessage());
+//            }
+//
+//            // Test delete book
+//            try {
+//                bookService.deleteBook(1L); // Book đang được mượn (returnDate=null)
+//            } catch (ConflictException e) {
+//                System.out.println("Expected conflict error: " + e.getMessage());
+//            }
         };
     }
 
