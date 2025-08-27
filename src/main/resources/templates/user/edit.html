@@ -22,9 +22,9 @@
             <div th:errors="*{email}" class="text-danger"></div>
         </div>
         <div class="mb-3">
-            <label for="phone" class="form-label">Phone</label>
-            <input type="text" class="form-control" id="phone" th:field="*{phone}">
-            <div th:errors="*{phone}" class="text-danger"></div>
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}">
+            <div th:errors="*{phoneNumber}" class="text-danger"></div>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
         <a th:href="@{/users}" class="btn btn-secondary">Cancel</a>

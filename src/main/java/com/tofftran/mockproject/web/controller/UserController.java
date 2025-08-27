@@ -76,7 +76,7 @@ public class UserController {
             return "redirect:/users";
         } catch (Exception e){
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("users", userService.findUserById(id));
+            model.addAttribute("users", userService.findAllUsers());
             return "user/list";
         }
     }

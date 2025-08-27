@@ -13,17 +13,17 @@
     <form th:action="@{/borrowings}" th:object="${borrowing}" method="post">
         <div class="mb-3">
             <label for="book" class="form-label">Book</label>
-            <select class="form-control" id="book" th:field="*{book.id}">
+            <select class="form-control" id="book" th:field="*{bookId}">
                 <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}"></option>
             </select>
-            <div th:errors="*{book}" class="text-danger"></div>
+            <div th:errors="*{bookId}" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="user" class="form-label">User</label>
-            <select class="form-control" id="user" th:field="*{user.id}">
+            <select class="form-control" id="user" th:field="*{userId}">
                 <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
             </select>
-            <div th:errors="*{user}" class="text-danger"></div>
+            <div th:errors="*{userId}" class="text-danger"></div>
         </div>
         <div class="mb-3">
             <label for="borrowDate" class="form-label">Borrow Date</label>

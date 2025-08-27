@@ -1,5 +1,6 @@
 package com.tofftran.mockproject.data.service;
 
+import com.tofftran.mockproject.data.dto.BorrowingDTO;
 import com.tofftran.mockproject.data.entity.Book;
 import com.tofftran.mockproject.data.entity.Borrowing;
 import com.tofftran.mockproject.data.entity.User;
@@ -8,6 +9,7 @@ import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,21 +28,22 @@ public class BorrowingService {
         this.bookRepository = bookRepository;
     }
 
-    public Borrowing createBorrowing(Borrowing borrowing){
-        //Validate book and user existence
+    @Transactional
+    public Borrowing createBorrowing(Borrowing borrowing) {
+        // Validate book and user existence
         Book book = bookRepository.findById(borrowing.getBook().getId())
-                .orElseThrow(()-> new ResourceNotFoundException("Book not found with id: " + borrowing.getBook().getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowing.getBook().getId()));
         User user = userRepository.findById(borrowing.getUser().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowing.getUser().getId()));
 
-        //Validate borrow date
-        if (borrowing.getBorrowDate().isAfter(LocalDate.now())){
+        // Validate borrow date
+        if (borrowing.getBorrowDate().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Borrow date cannot be in the future");
         }
 
-        //Validate return date
-        if (borrowing.getReturnDate() != null && borrowing.getReturnDate().isBefore(borrowing.getBorrowDate())){
-            throw new IllegalArgumentException("Return day cannot be before borrow date");
+        // Validate return date
+        if (borrowing.getReturnDate() != null && borrowing.getReturnDate().isBefore(borrowing.getBorrowDate())) {
+            throw new IllegalArgumentException("Return date cannot be before borrow date");
         }
 
         borrowing.setBook(book);
@@ -48,35 +51,41 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
-    public List<Borrowing> findAllBorrowings(){
-        return borrowingRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<BorrowingDTO> findAllBorrowings() {
+        return borrowingRepository.findAllBorrowingDTOs();
     }
 
-    public Borrowing findBorrowingById (Long id){
-        return borrowingRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Borrowing is not found with id: " + id));
+
+    @Transactional(readOnly = true)
+    public BorrowingDTO findBorrowingById(Long id) {
+        return borrowingRepository.findBorrowingDTOById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
     }
 
-    public Borrowing updateBorrowing(Long id, Borrowing borrowingDetails){
+
+    @Transactional
+    public Borrowing updateBorrowing(Long id, BorrowingDTO borrowingDetails) {
         Borrowing borrowing = borrowingRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Borrowing is not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
 
-        //Validate book and user existence
-        Book book = bookRepository.findById(borrowingDetails.getBook().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowingDetails.getBook().getId()));
-        User user = userRepository.findById(borrowingDetails.getUser().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowingDetails.getUser().getId()));
+        // Validate book and user existence
+        Book book = bookRepository.findById(borrowingDetails.getBookId())
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowingDetails.getBookId()));
+        User user = userRepository.findById(borrowingDetails.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowingDetails.getUserId()));
 
-        //Validate borrow date
-        if (borrowingDetails.getBorrowDate().isAfter(LocalDate.now())){
+        // Validate borrow date
+        if (borrowingDetails.getBorrowDate().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Borrow date cannot be in the future");
-        };
+        }
 
         // Validate return date if present
         if (borrowingDetails.getReturnDate() != null && borrowingDetails.getReturnDate().isBefore(borrowingDetails.getBorrowDate())) {
             throw new IllegalArgumentException("Return date cannot be before borrow date");
         }
 
+        // Update fields
         borrowing.setBook(book);
         borrowing.setUser(user);
         borrowing.setBorrowDate(borrowingDetails.getBorrowDate());
@@ -84,7 +93,8 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
-    public void deleteBorrowing(Long id){
+    @Transactional
+    public void deleteBorrowing(Long id) {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
         borrowingRepository.deleteById(id);

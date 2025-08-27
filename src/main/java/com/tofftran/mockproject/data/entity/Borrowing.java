@@ -30,7 +30,6 @@ public class Borrowing {
 
     @NotNull(message = "Borrow date cannot be null")
     private LocalDate borrowDate;
-
     private LocalDate returnDate;
 
 }

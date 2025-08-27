@@ -25,8 +25,8 @@
         <tbody>
         <tr th:each="borrowing : ${borrowings}">
             <td th:text="${borrowing.id}"></td>
-            <td th:text="${borrowing.book.title}"></td>
-            <td th:text="${borrowing.user.name}"></td>
+            <td th:text="${borrowing.bookTitle}"></td>
+            <td th:text="${borrowing.userName}"></td>
             <td th:text="${borrowing.borrowDate}"></td>
             <td th:text="${borrowing.returnDate}"></td>
             <td>
