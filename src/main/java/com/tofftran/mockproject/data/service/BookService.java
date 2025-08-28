@@ -40,6 +40,10 @@ public class BookService {
         return bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found with id " + id));
     }
 
+    public Page<Book> findByTitle(String title, Pageable pageable){
+        return bookRepository.findByTitle(title, pageable);
+    }
+
     public Book updateBook(Long id, Book bookDetails) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));

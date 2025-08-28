@@ -34,13 +34,21 @@ public class BorrowingController {
     @GetMapping
     @Transactional(readOnly = true)
     public String listBorrowings(@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "5") int size, Model model) {
+                                 @RequestParam(defaultValue = "5") int size,
+                                 @RequestParam(required = false) String search ,Model model) {
         Pageable pageable = PageRequest.of(page, size);
         Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+
+        if (search != null && !search.isEmpty()){
+            borrowingPage = borrowingService.findByBookTitleOrUserName(search, pageable);
+        } else borrowingPage = borrowingService.findAllBorrowings(pageable);
+
         model.addAttribute("borrowings", borrowingPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", borrowingPage.getTotalPages());
         model.addAttribute("totalItems", borrowingPage.getTotalElements());
+        model.addAttribute("search", search);
+
         return "borrowing/list";
     }
 

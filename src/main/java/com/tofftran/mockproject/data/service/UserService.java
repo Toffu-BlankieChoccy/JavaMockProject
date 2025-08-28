@@ -34,6 +34,10 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
+    public Page<User> findByNameOrEmail(String keyword,Pageable pageable){
+        return userRepository.findByNameOrEmail(keyword, pageable);
+    }
+
     public User findUserById(Long id){
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }

@@ -59,6 +59,10 @@ public class BorrowingService {
         return borrowingRepository.findAllBorrowingDTOs(pageable);
     }
 
+    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
+        return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
+    }
+
 
     @Transactional(readOnly = true)
     public BorrowingDTO findBorrowingById(Long id) {

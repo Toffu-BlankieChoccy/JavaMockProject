@@ -22,9 +22,17 @@ public class BookController {
     //Read all books
     @GetMapping
     public String listBooks(@RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "5") int size,Model model){
+                            @RequestParam(defaultValue = "5") int size,
+                            @RequestParam(required = false) String search, Model model){
         Pageable pageable = PageRequest.of(page, size);
         Page<Book> bookPage = bookService.findAllBooks(pageable);
+
+        if (search != null && !search.isEmpty()){
+            bookPage = bookService.findByTitle(search, pageable);
+        } else {
+            bookPage = bookService.findAllBooks(pageable);
+        }
+
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bookPage.getTotalPages());

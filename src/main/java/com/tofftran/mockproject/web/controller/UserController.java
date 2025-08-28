@@ -24,13 +24,22 @@ public class UserController {
     //Read all users
     @GetMapping
     public String listUsers(@RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "5") int size, Model model){
+                            @RequestParam(defaultValue = "5") int size,
+                            @RequestParam(required = false) String search, Model model){
         Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userService.findAllUsers(pageable);
+
+        if (search != null && !search.isEmpty()){
+            userPage = userService.findByNameOrEmail(search, pageable);
+        } else {
+            userPage = userService.findAllUsers(pageable);
+        }
+
         model.addAttribute("users", userPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userPage.getTotalPages());
         model.addAttribute("totalItems", userPage.getTotalElements());
+        model.addAttribute("search", search);
         return "user/list";
     }
 
