@@ -1,9 +1,12 @@
 package com.tofftran.mockproject.data.service;
 
+import com.tofftran.mockproject.data.entity.Book;
 import com.tofftran.mockproject.data.entity.User;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ConflictException;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +28,10 @@ public class UserService {
 
     public List<User> findAllUsers(){
         return userRepository.findAll();
+    }
+
+    public Page<User> findAllUsers(Pageable pageable){
+        return userRepository.findAll(pageable);
     }
 
     public User findUserById(Long id){

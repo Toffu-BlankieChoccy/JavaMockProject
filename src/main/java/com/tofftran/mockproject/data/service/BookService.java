@@ -5,6 +5,8 @@ import com.tofftran.mockproject.data.repository.BookRepository;
 import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.exception.ConflictException;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +32,10 @@ public class BookService {
         return bookRepository.findAll();
     }
 
+    public Page<Book> findAllBooks(Pageable pageable) {
+        return bookRepository.findAll(pageable);
+    }
+
     public Book findBookById(Long id) {
         return bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found with id " + id));
     }
@@ -52,7 +58,7 @@ public class BookService {
     public void deleteBook(Long id) {
     Book book = bookRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
         // Check if book is currently borrowed
-        if (!borrowingRepository.findByBookAndReturnDateIsNull(book).isEmpty()) {
+        if (!borrowingRepository.findByBookAndReturnDateIsNull(book, Pageable.unpaged()).isEmpty()) {
             throw new ConflictException("Cannot delete book with id " + id + " because it is currently borrowed");
         }
         bookRepository.deleteById(id);

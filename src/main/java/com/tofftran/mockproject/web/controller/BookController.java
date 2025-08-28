@@ -3,6 +3,9 @@ package com.tofftran.mockproject.web.controller;
 import com.tofftran.mockproject.data.entity.Book;
 import com.tofftran.mockproject.data.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,8 +21,14 @@ public class BookController {
 
     //Read all books
     @GetMapping
-    public String listBooks(Model model){
-        model.addAttribute("books", bookService.findAllBooks());
+    public String listBooks(@RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size,Model model){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Book> bookPage = bookService.findAllBooks(pageable);
+        model.addAttribute("books", bookPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("totalItems", bookPage.getTotalElements());
         return "book/list";
     }
 
@@ -76,7 +85,8 @@ public class BookController {
             return "redirect:/books";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("books", bookService.findAllBooks());
+            Pageable pageable = PageRequest.of(0, 5);
+            model.addAttribute("books", bookService.findAllBooks(pageable).getContent());
             return "book/list";
         }
     }

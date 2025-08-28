@@ -8,6 +8,9 @@ import com.tofftran.mockproject.data.service.BookService;
 import com.tofftran.mockproject.data.service.BorrowingService;
 import com.tofftran.mockproject.data.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -30,8 +33,14 @@ public class BorrowingController {
     // Read all borrowings
     @GetMapping
     @Transactional(readOnly = true)
-    public String listBorrowings(Model model) {
-        model.addAttribute("borrowings", borrowingService.findAllBorrowings());
+    public String listBorrowings(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "5") int size, Model model) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+        model.addAttribute("borrowings", borrowingPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", borrowingPage.getTotalPages());
+        model.addAttribute("totalItems", borrowingPage.getTotalElements());
         return "borrowing/list";
     }
 
@@ -112,7 +121,8 @@ public class BorrowingController {
             return "redirect:/borrowings";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("borrowings", borrowingService.findAllBorrowings());
+            Pageable pageable = PageRequest.of(0, 5); // Default page and size
+            model.addAttribute("borrowings", borrowingService.findAllBorrowings(pageable));
             return "borrowing/list";
         }
     }

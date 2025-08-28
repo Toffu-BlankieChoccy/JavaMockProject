@@ -8,6 +8,8 @@ import com.tofftran.mockproject.data.repository.BookRepository;
 import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +53,10 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
+
     @Transactional(readOnly = true)
-    public List<BorrowingDTO> findAllBorrowings() {
-        return borrowingRepository.findAllBorrowingDTOs();
+    public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
+        return borrowingRepository.findAllBorrowingDTOs(pageable);
     }
 
 
