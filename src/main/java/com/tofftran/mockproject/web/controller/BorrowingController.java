@@ -36,6 +36,7 @@ public class BorrowingController {
     public String listBorrowings(@RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "5") int size,
                                  @RequestParam(required = false) String search ,Model model) {
+        page = Math.max(0, page); //Negative page number validation
         Pageable pageable = PageRequest.of(page, size);
         Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
 
@@ -47,6 +48,7 @@ public class BorrowingController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", borrowingPage.getTotalPages());
         model.addAttribute("totalItems", borrowingPage.getTotalElements());
+        model.addAttribute("size", size);
         model.addAttribute("search", search);
 
         return "borrowing/list";

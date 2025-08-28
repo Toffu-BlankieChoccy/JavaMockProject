@@ -4,6 +4,7 @@ import com.tofftran.mockproject.data.entity.Book;
 import com.tofftran.mockproject.data.entity.User;
 import com.tofftran.mockproject.data.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +27,13 @@ public class UserController {
     public String listUsers(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
                             @RequestParam(required = false) String search, Model model){
+        page = Math.max(0, page); //Negative page number validation
         Pageable pageable = PageRequest.of(page, size);
         Page<User> userPage = userService.findAllUsers(pageable);
 
         if (search != null && !search.isEmpty()){
-            userPage = userService.findByNameOrEmail(search, pageable);
-        } else {
+            userPage = userService.findByNameOrEmail(search.trim(), pageable);        }
+        else {
             userPage = userService.findAllUsers(pageable);
         }
 
@@ -39,6 +41,7 @@ public class UserController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userPage.getTotalPages());
         model.addAttribute("totalItems", userPage.getTotalElements());
+        model.addAttribute("size", size);
         model.addAttribute("search", search);
         return "user/list";
     }

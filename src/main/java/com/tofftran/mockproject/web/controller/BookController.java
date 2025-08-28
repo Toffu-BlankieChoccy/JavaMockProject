@@ -24,11 +24,12 @@ public class BookController {
     public String listBooks(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
                             @RequestParam(required = false) String search, Model model){
+        page = Math.max(0, page); //Negative page number validation
         Pageable pageable = PageRequest.of(page, size);
         Page<Book> bookPage = bookService.findAllBooks(pageable);
 
         if (search != null && !search.isEmpty()){
-            bookPage = bookService.findByTitle(search, pageable);
+            bookPage = bookService.findByTitle(search.trim(), pageable);
         } else {
             bookPage = bookService.findAllBooks(pageable);
         }
@@ -36,7 +37,9 @@ public class BookController {
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("size", size);
         model.addAttribute("totalItems", bookPage.getTotalElements());
+        model.addAttribute("search", search);
         return "book/list";
     }
 
