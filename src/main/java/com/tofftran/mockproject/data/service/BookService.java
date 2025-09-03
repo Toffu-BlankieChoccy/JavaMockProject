@@ -54,6 +54,7 @@ public class BookService {
 
         book.setTitle(bookDetails.getTitle());
         book.setIsbn(bookDetails.getIsbn());
+
         book.setPublishedDate(bookDetails.getPublishedDate());
         book.setPrice(bookDetails.getPrice());
         return bookRepository.save(book);

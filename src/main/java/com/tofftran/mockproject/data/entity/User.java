@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -36,6 +38,18 @@ public class User {
 
     @Size(min = 8, message = "Password length must be up to 8 characters")
     private String password;
+
+    private Instant createdOn;
+
+    private Instant updatedOn;
+
+    @Enumerated(EnumType.STRING)
+    private Role role; // Thêm trường role
+
+    public enum Role {
+        ADMIN,
+        USER
+    }
 
 
     //@OneToMany(mappedBy = "templates/user", cascade = CascadeType.ALL, orphanRemoval = true)

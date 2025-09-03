@@ -10,8 +10,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -41,6 +43,9 @@ public class Book {
     @NotNull(message = "Price cannot be null")
     @PositiveOrZero(message = "Price must be a positive number")
     private double Price;
+
+    private Instant createdOn;
+    private Instant updatedOn;
 
     //@OneToMany(mappedBy = "templates/book", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)

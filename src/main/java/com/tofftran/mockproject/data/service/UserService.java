@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -39,7 +40,30 @@ public class UserService {
         user.setName(userDTO.getName());
         user.setEmail(userDTO.getEmail());
         user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Encrypt password
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));// Encrypt password
+        user.setRole(User.Role.USER);
+        user.setCreatedOn(Instant.now());
+        user.setUpdatedOn(Instant.now());
+        User savedUser = userRepository.save(user);
+        return convertToDTO(savedUser);
+    }
+
+    @Transactional
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (!user.getEmail().equals(userDTO.getEmail()) && userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new ConflictException("Email " + userDTO.getEmail() + " already exists");
+        }
+
+        user.setName(userDTO.getName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setUpdatedOn(Instant.now());
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }
@@ -65,24 +89,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id)));
     }
 
-    @Transactional
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-        if (!user.getEmail().equals(userDTO.getEmail()) && userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new ConflictException("Email " + userDTO.getEmail() + " already exists");
-        }
-
-        user.setName(userDTO.getName());
-        user.setEmail(userDTO.getEmail());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        }
-        User savedUser = userRepository.save(user);
-        return convertToDTO(savedUser);
-    }
 
     @Transactional
     public void deleteUser(Long id) {

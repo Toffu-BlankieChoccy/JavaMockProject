@@ -22,6 +22,12 @@ public class BookApiController {
         return  ResponseEntity.ok(books);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<Book>> searchBook(@RequestParam String keyword, Pageable pageable){
+        Page<Book> books =  bookService.findByTitle(keyword, pageable);
+        return ResponseEntity.ok(books);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBookById(@PathVariable Long id){
         Book book = bookService.findBookById(id);

@@ -66,9 +66,8 @@
                        th:href="@{/users(page=${p}, size=${size}, search=${search})}"
                        th:text="${p + 1}">
                     </a>
-
                 </li>
-                `
+
 
                 <!-- Next -->
                 <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
@@ -87,3 +86,18 @@
 </div>
 </body>
 </html>
+
+<script>
+    fetch('/api/books?page=0&size=5')
+        .then(response => response.json())
+        .then(data => {
+            const books = data.content;
+            let html = '<ul>';
+            books.forEach(book => {
+                html += `<li>${book.title} - $${book.price}</li>`;
+            });
+            html += '</ul>';
+            document.getElementById('bookList').innerHTML = html;
+        });
+</script>
+<div id="bookList"></div>
