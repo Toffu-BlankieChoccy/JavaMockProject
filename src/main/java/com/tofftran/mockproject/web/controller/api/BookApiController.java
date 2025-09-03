@@ -34,6 +34,12 @@ public class BookApiController {
         return ResponseEntity.status(201).body(book);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> update(@PathVariable Long id, @RequestBody Book bookDetails){
+        Book book = bookService.updateBook(id, bookDetails);
+        return ResponseEntity.status(201).body(book);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook (@PathVariable Long id){
         bookService.deleteBook(id);

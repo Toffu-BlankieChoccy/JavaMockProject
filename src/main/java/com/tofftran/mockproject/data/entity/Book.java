@@ -1,6 +1,7 @@
 package com.tofftran.mockproject.data.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -43,6 +44,7 @@ public class Book {
 
     //@OneToMany(mappedBy = "templates/book", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Borrowing> borrowings = new ArrayList<>();
 
 }
