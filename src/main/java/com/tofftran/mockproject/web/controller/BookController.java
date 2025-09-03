@@ -34,6 +34,13 @@ public class BookController {
             bookPage = bookService.findAllBooks(pageable);
         }
 
+        // Check if page is out of scope
+        if (page > bookPage.getTotalPages() - 1 && bookPage.getTotalPages() > 0) {
+            // Redirect to the last page
+            model.addAttribute("errorMessage", "Page index out of range. Redirected to last page.");
+            return "redirect:/users?page=" + (bookPage.getTotalPages() - 1) + "&size=" + size + (search != null ? "&search=" + search : "");
+        }
+
         model.addAttribute("books", bookPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", bookPage.getTotalPages());

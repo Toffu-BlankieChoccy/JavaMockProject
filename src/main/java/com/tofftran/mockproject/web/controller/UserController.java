@@ -37,6 +37,13 @@ public class UserController {
             userPage = userService.findAllUsers(pageable);
         }
 
+        // Check if page is out of scope
+        if (page > userPage.getTotalPages() - 1 && userPage.getTotalPages() > 0) {
+            // Redirect to the last page
+            model.addAttribute("errorMessage", "Page index out of range. Redirected to last page.");
+            return "redirect:/users?page=" + (userPage.getTotalPages() - 1) + "&size=" + size + (search != null ? "&search=" + search : "");
+        }
+
         model.addAttribute("users", userPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userPage.getTotalPages());

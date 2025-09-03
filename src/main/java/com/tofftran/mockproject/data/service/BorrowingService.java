@@ -8,6 +8,7 @@ import com.tofftran.mockproject.data.repository.BookRepository;
 import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,32 @@ public class BorrowingService {
 
     private final BookRepository bookRepository;
 
-    public BorrowingService(BorrowingRepository borrowingRepository, UserRepository userRepository, BookRepository bookRepository) {
+    private final ModelMapper modelMapper;
+
+    public BorrowingService(BorrowingRepository borrowingRepository, UserRepository userRepository, BookRepository bookRepository, ModelMapper modelMapper) {
         this.borrowingRepository = borrowingRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+        this.modelMapper = modelMapper;
     }
 
+    @Transactional(readOnly = true)
+    public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
+        return borrowingRepository.findAllBorrowingDTOs(pageable);
+    }
+
+    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
+        return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
+    }
+
+
+    @Transactional(readOnly = true)
+    public BorrowingDTO findBorrowingById(Long id) {
+        return borrowingRepository.findBorrowingDTOById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
+    }
+
+    //For non api
     @Transactional
     public Borrowing createBorrowing(Borrowing borrowing) {
         // Validate book and user existence
@@ -53,24 +74,45 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
+    //For api
+    @Transactional
+    public BorrowingDTO postBorrowing(BorrowingDTO borrowingDTO) {
+        Book book = bookRepository.findById(borrowingDTO.getBookId())
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowingDTO.getBookId()));
+        User user = userRepository.findById(borrowingDTO.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowingDTO.getUserId()));
+
+        if (borrowingDTO.getBorrowDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Borrow date cannot be in the future");
+        }
+        if (borrowingDTO.getReturnDate() != null && borrowingDTO.getReturnDate().isBefore(borrowingDTO.getBorrowDate())) {
+            throw new IllegalArgumentException("Return date cannot be before borrow date");
+        }
+
+        Borrowing borrowing = modelMapper.map(borrowingDTO, Borrowing.class);
+        borrowing.setBook(book);
+        borrowing.setUser(user);
+
+        Borrowing savedBorrowing = borrowingRepository.save(borrowing);
+        return modelMapper.map(savedBorrowing, BorrowingDTO.class);
+    }
+
+
+
+
+
+//    @Transactional(readOnly = true)
+//    public Page<BorrowingDTO> findByFilters(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+//        return borrowingRepository.findByFilters(keyword, status, startDate, endDate, pageable);
+//    }
 
     @Transactional(readOnly = true)
-    public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
-        return borrowingRepository.findAllBorrowingDTOs(pageable);
-    }
-
-    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
-        return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
+    public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return borrowingRepository.findByFilters(keyword, startDate, endDate, pageable);
     }
 
 
-    @Transactional(readOnly = true)
-    public BorrowingDTO findBorrowingById(Long id) {
-        return borrowingRepository.findBorrowingDTOById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
-    }
-
-
+    //For non api
     @Transactional
     public Borrowing updateBorrowing(Long id, BorrowingDTO borrowingDetails) {
         Borrowing borrowing = borrowingRepository.findById(id)
@@ -99,6 +141,40 @@ public class BorrowingService {
         borrowing.setReturnDate(borrowingDetails.getReturnDate());
         return borrowingRepository.save(borrowing);
     }
+
+    //For api
+    @Transactional
+    public Borrowing putBorrowing(Long id, BorrowingDTO borrowingDTO) {
+        Borrowing borrowing = borrowingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
+
+        // Validate book and user existence
+        Book book = bookRepository.findById(borrowingDTO.getBookId())
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowingDTO.getBookId()));
+        User user = userRepository.findById(borrowingDTO.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowingDTO.getUserId()));
+
+        // Validate borrow date
+        if (borrowingDTO.getBorrowDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Borrow date cannot be in the future");
+        }
+
+        // Validate return date if present
+        if (borrowingDTO.getReturnDate() != null && borrowingDTO.getReturnDate().isBefore(borrowingDTO.getBorrowDate())) {
+            throw new IllegalArgumentException("Return date cannot be before borrow date");
+        }
+
+        // Update fields
+        borrowing.setBook(book);
+        borrowing.setUser(user);
+        borrowing.setBorrowDate(borrowingDTO.getBorrowDate());
+        borrowing.setReturnDate(borrowingDTO.getReturnDate());
+
+        // Save and map to DTO
+        Borrowing savedBorrowing = borrowingRepository.save(borrowing);
+        return modelMapper.map(savedBorrowing, BorrowingDTO.class);
+    }
+
 
     @Transactional
     public void deleteBorrowing(Long id) {

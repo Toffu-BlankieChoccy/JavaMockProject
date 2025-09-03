@@ -11,11 +11,14 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/borrowings")
@@ -35,14 +38,25 @@ public class BorrowingController {
     @Transactional(readOnly = true)
     public String listBorrowings(@RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "5") int size,
-                                 @RequestParam(required = false) String search ,Model model) {
+                                 @RequestParam(required = false) String search ,
+                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate, Model model) {
         page = Math.max(0, page); //Negative page number validation
         Pageable pageable = PageRequest.of(page, size);
         Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
 
-        if (search != null && !search.isEmpty()){
-            borrowingPage = borrowingService.findByBookTitleOrUserName(search, pageable);
-        } else borrowingPage = borrowingService.findAllBorrowings(pageable);
+        if ((search != null && !search.trim().isEmpty()) || startDate != null || endDate != null) {
+            borrowingPage = borrowingService.findByFilters(search, startDate, endDate, pageable);
+        }
+        else borrowingPage = borrowingService.findAllBorrowings(pageable);
+        // Check if page is out of scope
+        if (page > borrowingPage.getTotalPages() - 1 && borrowingPage.getTotalPages() > 0) {
+            model.addAttribute("errorMessage", "Page index out of range. Redirected to last page.");
+            return "redirect:/borrowings?page=" + (borrowingPage.getTotalPages() - 1) + "&size=" + size +
+                    (search != null ? "&search=" + search : "") +
+                    (startDate != null ? "&startDate=" + startDate : "") +
+                    (endDate != null ? "&endDate=" + endDate : "");
+        }
 
         model.addAttribute("borrowings", borrowingPage.getContent());
         model.addAttribute("currentPage", page);
@@ -50,7 +64,8 @@ public class BorrowingController {
         model.addAttribute("totalItems", borrowingPage.getTotalElements());
         model.addAttribute("size", size);
         model.addAttribute("search", search);
-
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
         return "borrowing/list";
     }
 
