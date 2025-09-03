@@ -1,5 +1,6 @@
 package com.tofftran.mockproject.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -33,8 +34,12 @@ public class User {
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     private String phoneNumber;
 
+    @Size(min = 8, message = "Password length must be up to 8 characters")
+    private String password;
+
 
     //@OneToMany(mappedBy = "templates/user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Borrowing> borrowings = new ArrayList<>();
 }

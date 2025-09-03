@@ -1,6 +1,6 @@
 package com.tofftran.mockproject.web.controller.api;
 
-import com.tofftran.mockproject.data.entity.User;
+import com.tofftran.mockproject.data.dto.UserDTO;
 import com.tofftran.mockproject.data.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,26 +17,26 @@ public class UserApiController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<User>> getAllUsers(Pageable pageable){
-        Page<User> users = userService.findAllUsers(pageable);
+    public ResponseEntity<Page<UserDTO>> getAllUsers(Pageable pageable){
+        Page<UserDTO> users = userService.findAllUsers(pageable);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id){
-        User user = userService.findUserById(id);
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
+        UserDTO user = userService.findUserById(id);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User userDetails){
-        User user = userService.createUser(userDetails);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDetails){
+        UserDTO user = userService.createUser(userDetails);
         return ResponseEntity.status(201).body(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails){
-        User user = userService.updateUser(id, userDetails);
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDetails){
+        UserDTO user = userService.updateUser(id, userDetails);
         return ResponseEntity.status(201).body(user);
     }
 

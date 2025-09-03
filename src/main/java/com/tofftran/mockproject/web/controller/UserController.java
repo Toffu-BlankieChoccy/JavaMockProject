@@ -1,10 +1,9 @@
 package com.tofftran.mockproject.web.controller;
 
-import com.tofftran.mockproject.data.entity.Book;
+import com.tofftran.mockproject.data.dto.UserDTO;
 import com.tofftran.mockproject.data.entity.User;
 import com.tofftran.mockproject.data.service.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +28,7 @@ public class UserController {
                             @RequestParam(required = false) String search, Model model){
         page = Math.max(0, page); //Negative page number validation
         Pageable pageable = PageRequest.of(page, size);
-        Page<User> userPage = userService.findAllUsers(pageable);
+        Page<UserDTO> userPage = userService.findAllUsers(pageable);
 
         if (search != null && !search.isEmpty()){
             userPage = userService.findByNameOrEmail(search.trim(), pageable);        }
@@ -62,7 +61,7 @@ public class UserController {
 
     //Handle add form submission
     @PostMapping
-    public String addUser(@Valid @ModelAttribute("user") User user, BindingResult result, Model model){
+    public String addUser(@Valid @ModelAttribute("user") UserDTO user, BindingResult result, Model model){
         if (result.hasErrors()){
             return "user/add";
         }
@@ -78,14 +77,14 @@ public class UserController {
     //Edit form
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model){
-        User user = userService.findUserById(id);
+        UserDTO user = userService.findUserById(id);
         model.addAttribute("user", user);
         return "user/edit";
     }
 
     //Handle edit form submission
     @PostMapping("/{id}")
-    public String updateUser(@PathVariable Long id, @Valid @ModelAttribute("user") User user, BindingResult result, Model model){
+    public String updateUser(@PathVariable Long id, @Valid @ModelAttribute("user") UserDTO user, BindingResult result, Model model){
         if (result.hasErrors()){
             return "user/edit";
         }

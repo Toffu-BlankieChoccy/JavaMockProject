@@ -66,5 +66,5 @@ public class BookService {
             throw new ConflictException("Cannot delete book with id " + id + " because it is currently borrowed");
         }
         bookRepository.deleteById(id);
-}
+    }
 }

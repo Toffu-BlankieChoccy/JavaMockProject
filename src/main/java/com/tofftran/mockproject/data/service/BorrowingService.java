@@ -8,14 +8,12 @@ import com.tofftran.mockproject.data.repository.BookRepository;
 import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class BorrowingService {
@@ -96,15 +94,6 @@ public class BorrowingService {
         Borrowing savedBorrowing = borrowingRepository.save(borrowing);
         return convertToDTO(savedBorrowing);
     }
-
-
-
-
-
-//    @Transactional(readOnly = true)
-//    public Page<BorrowingDTO> findByFilters(String keyword, String status, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-//        return borrowingRepository.findByFilters(keyword, status, startDate, endDate, pageable);
-//    }
 
     @Transactional(readOnly = true)
     public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, Pageable pageable) {
