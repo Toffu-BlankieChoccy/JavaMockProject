@@ -37,7 +37,7 @@ public class BorrowingApiController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BorrowingDTO> updateBorrowing(@PathVariable Long id, @RequestBody BorrowingDTO borrowingDetails){
-        BorrowingDTO borrowingDTO = borrowingService.updateBorrowing(id, borrowingDetails);
+        BorrowingDTO borrowingDTO = borrowingService.putBorrowing(id, borrowingDetails);
         return ResponseEntity.status(201).body(borrowingDTO);
     }
 

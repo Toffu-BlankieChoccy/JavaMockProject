@@ -25,13 +25,11 @@ public class BorrowingService {
 
     private final BookRepository bookRepository;
 
-    private final ModelMapper modelMapper;
 
-    public BorrowingService(BorrowingRepository borrowingRepository, UserRepository userRepository, BookRepository bookRepository, ModelMapper modelMapper) {
+    public BorrowingService(BorrowingRepository borrowingRepository, UserRepository userRepository, BookRepository bookRepository) {
         this.borrowingRepository = borrowingRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
-        this.modelMapper = modelMapper;
     }
 
     @Transactional(readOnly = true)
@@ -89,12 +87,14 @@ public class BorrowingService {
             throw new IllegalArgumentException("Return date cannot be before borrow date");
         }
 
-        Borrowing borrowing = modelMapper.map(borrowingDTO, Borrowing.class);
+        Borrowing borrowing = new Borrowing();
         borrowing.setBook(book);
         borrowing.setUser(user);
+        borrowing.setBorrowDate(borrowingDTO.getBorrowDate());
+        borrowing.setReturnDate(borrowingDTO.getReturnDate());
 
         Borrowing savedBorrowing = borrowingRepository.save(borrowing);
-        return modelMapper.map(savedBorrowing, BorrowingDTO.class);
+        return convertToDTO(savedBorrowing);
     }
 
 
@@ -144,35 +144,30 @@ public class BorrowingService {
 
     //For api
     @Transactional
-    public Borrowing putBorrowing(Long id, BorrowingDTO borrowingDTO) {
+    public BorrowingDTO putBorrowing(Long id, BorrowingDTO borrowingDTO) {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
 
-        // Validate book and user existence
         Book book = bookRepository.findById(borrowingDTO.getBookId())
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + borrowingDTO.getBookId()));
         User user = userRepository.findById(borrowingDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + borrowingDTO.getUserId()));
 
-        // Validate borrow date
         if (borrowingDTO.getBorrowDate().isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("Borrow date cannot be in the future");
         }
 
-        // Validate return date if present
         if (borrowingDTO.getReturnDate() != null && borrowingDTO.getReturnDate().isBefore(borrowingDTO.getBorrowDate())) {
             throw new IllegalArgumentException("Return date cannot be before borrow date");
         }
 
-        // Update fields
         borrowing.setBook(book);
         borrowing.setUser(user);
         borrowing.setBorrowDate(borrowingDTO.getBorrowDate());
         borrowing.setReturnDate(borrowingDTO.getReturnDate());
 
-        // Save and map to DTO
         Borrowing savedBorrowing = borrowingRepository.save(borrowing);
-        return modelMapper.map(savedBorrowing, BorrowingDTO.class);
+        return convertToDTO(savedBorrowing);
     }
 
 
@@ -181,5 +176,17 @@ public class BorrowingService {
         Borrowing borrowing = borrowingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
         borrowingRepository.deleteById(id);
+    }
+
+    private BorrowingDTO convertToDTO(Borrowing borrowing) {
+        return new BorrowingDTO(
+                borrowing.getId(),
+                borrowing.getBook().getId(),
+                borrowing.getBook().getTitle(),
+                borrowing.getUser().getId(),
+                borrowing.getUser().getName(),
+                borrowing.getBorrowDate(),
+                borrowing.getReturnDate()
+        );
     }
 }
