@@ -44,6 +44,7 @@ public class UserService {
         user.setRole(User.Role.USER);
         user.setCreatedOn(Instant.now());
         user.setUpdatedOn(Instant.now());
+        user.setRole(User.Role.USER); //Role user by default
         User savedUser = userRepository.save(user);
         return convertToDTO(savedUser);
     }

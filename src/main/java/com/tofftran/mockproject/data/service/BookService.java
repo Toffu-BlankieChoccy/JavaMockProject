@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -25,6 +26,8 @@ public class BookService {
         if (bookRepository.existsByIsbn(book.getIsbn())) {
             throw new ConflictException("ISBN " + book.getIsbn() + " already exists");
         }
+        book.setCreatedOn(Instant.now());
+        book.setUpdatedOn(Instant.now());
         return bookRepository.save(book);
     }
 
@@ -54,7 +57,7 @@ public class BookService {
 
         book.setTitle(bookDetails.getTitle());
         book.setIsbn(bookDetails.getIsbn());
-
+        book.setUpdatedOn(Instant.now());
         book.setPublishedDate(bookDetails.getPublishedDate());
         book.setPrice(bookDetails.getPrice());
         return bookRepository.save(book);

@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +22,7 @@ public class BookController {
 
     //Read all books
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public String listBooks(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
                             @RequestParam(required = false) String search, Model model){
@@ -52,6 +54,7 @@ public class BookController {
 
     //Add form
     @GetMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String showAddForm(Model model){
         model.addAttribute("book", new Book());
         return "book/add";
@@ -59,6 +62,7 @@ public class BookController {
 
     //Handle add form submission
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String addBook(@Valid @ModelAttribute("book") Book book, BindingResult result, Model model){
         if (result.hasErrors()){
             return "book/add";
@@ -74,6 +78,7 @@ public class BookController {
 
     //Edit form
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String showEditForm(@PathVariable Long id, Model model){
         Book book = bookService.findBookById(id);
         model.addAttribute("book", book);
@@ -82,6 +87,7 @@ public class BookController {
 
     //Handle edit form submission
     @PostMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String updateBook(@PathVariable Long id, @Valid @ModelAttribute("book") Book book, BindingResult result, Model model){
         if (result.hasErrors()){
             return "book/edit";
@@ -97,6 +103,7 @@ public class BookController {
 
     //Delete
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public String deleteBook(@PathVariable Long id, Model model){
         try{
             bookService.deleteBook(id);
