@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +28,7 @@ public class BookController {
                             @RequestParam(defaultValue = "5") int size,
                             @RequestParam(required = false) String search, Model model){
         page = Math.max(0, page); //Negative page number validation
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         Page<Book> bookPage = bookService.findAllBooks(pageable);
 
         if (search != null && !search.isEmpty()){

@@ -24,7 +24,6 @@ public class UserDTO {
     @Size(max = 15, message = "Phone number cannot exceed 15 characters")
     private String phoneNumber;
 
-    @NotNull(message = "Password cannot be null")
     @Size(min = 8, message = "Password length must be at least 8 characters")
     private String password;
 
