@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ public class Book {
     private String isbn;
 
     @NotNull(message = "Published data cannot be null")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate publishedDate;
 
     @NotNull(message = "Price cannot be null")

@@ -2,6 +2,7 @@ package com.tofftran.mockproject.data.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -13,7 +14,11 @@ public class BorrowingDTO {
     private String bookTitle;
     private Long userId;
     private String userName;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate borrowDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate returnDate;
 
     public BorrowingDTO() {
