@@ -14,7 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/admin/users")
+@RequestMapping("/users")
 @PreAuthorize("hasRole('ADMIN')")
 public class UserController {
     private final UserService userService;
