@@ -1,43 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
 <head>
     <title>Edit Borrowing</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container">
-    <h1>Edit Borrowing</h1>
-    <div th:if="${errorMessage}" class="alert alert-danger">
-        <span th:text="${errorMessage}"></span>
+<div layout:fragment="content">
+    <div class="container">
+        <h1>Edit Borrowing</h1>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <form th:action="@{/borrowings/{id}(id=${borrowing.id})}" th:object="${borrowing}" method="post">
+            <div class="mb-3">
+                <label for="bookId" class="form-label">Book</label>
+                <select class="form-control" id="bookId" th:field="*{bookId}">
+                    <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}"
+                            th:selected="${book.id == borrowing.bookId}"></option>
+                </select>
+                <div th:errors="*{bookId}" class="text-danger"></div>
+            </div>
+            <div class="mb-3">
+                <label for="userId" class="form-label">User</label>
+                <select class="form-control" id="userId" th:field="*{userId}">
+                    <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"
+                            th:selected="${user.id == borrowing.userId}"></option>
+                </select>
+                <div th:errors="*{userId}" class="text-danger"></div>
+            </div>
+            <div class="mb-3">
+                <label for="borrowDate" class="form-label">Borrow Date</label>
+                <input type="date" class="form-control" id="borrowDate" th:field="*{borrowDate}">
+                <div th:errors="*{borrowDate}" class="text-danger"></div>
+            </div>
+            <div class="mb-3">
+                <label for="returnDate" class="form-label">Return Date</label>
+                <input type="date" class="form-control" id="returnDate" th:field="*{returnDate}">
+                <div th:errors="*{returnDate}" class="text-danger"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a th:href="@{/borrowings}" class="btn btn-secondary">Cancel</a>
+        </form>
     </div>
-    <form th:action="@{/borrowings/{id}(id=${borrowing.id})}" th:object="${borrowing}" method="post">
-        <div class="mb-3">
-            <label for="bookId" class="form-label">Book</label>
-            <select class="form-control" id="bookId" th:field="*{bookId}">
-                <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}" th:selected="${book.id == borrowing.bookId}"></option>
-            </select>
-            <div th:errors="*{bookId}" class="text-danger"></div>
-        </div>
-        <div class="mb-3">
-            <label for="userId" class="form-label">User</label>
-            <select class="form-control" id="userId" th:field="*{userId}">
-                <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}" th:selected="${user.id == borrowing.userId}"></option>
-            </select>
-            <div th:errors="*{userId}" class="text-danger"></div>
-        </div>
-        <div class="mb-3">
-            <label for="borrowDate" class="form-label">Borrow Date</label>
-            <input type="date" class="form-control" id="borrowDate" th:field="*{borrowDate}">
-            <div th:errors="*{borrowDate}" class="text-danger"></div>
-        </div>
-        <div class="mb-3">
-            <label for="returnDate" class="form-label">Return Date</label>
-            <input type="date" class="form-control" id="returnDate" th:field="*{returnDate}">
-            <div th:errors="*{returnDate}" class="text-danger"></div>
-        </div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a th:href="@{/borrowings}" class="btn btn-secondary">Cancel</a>
-    </form>
 </div>
-</body>
 </html>
