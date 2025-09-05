@@ -1,0 +1,17 @@
+<div layout:fragment="form" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+    <form th:action="${action}" th:object="${entity}" method="post" class="needs-validation" novalidate>
+        <input type="hidden" name="_csrf" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <div th:each="field : ${fields}">
+            <div class="mb-3">
+                <label th:for="${field.id}" class="form-label" th:text="${field.label}"></label>
+                <input th:field="*{__${field.name}__}" th:type="${field.type}" class="form-control"
+                       th:id="${field.id}" th:placeholder="${field.placeholder}" th:required="${field.required}">
+                <div th:if="${#fields.hasErrors(field.name)}" class="invalid-feedback">
+                    <span th:errors="*{__${field.name}__}" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a th:href="${cancelUrl}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

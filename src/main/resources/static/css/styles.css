@@ -1,0 +1,17 @@
+body {
+background-color: #f8f9fa;
+}
+
+.table th a {
+color: #000;
+text-decoration: none;
+}
+
+.table th a:hover {
+color: #007bff;
+}
+
+.sort-asc::after, .sort-desc::after {
+font-size: 0.8em;
+vertical-align: middle;
+}

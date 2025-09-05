@@ -1,114 +1,108 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
 <head>
     <title>Book List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container">
-    <h1>Books</h1>
+<div layout:fragment="content">
+    <div class="container">
+        <h1>Books</h1>
 
-    <!-- Search bar -->
-    <form th:action="@{/books}" method="get" class="mb-3">
-        <div class="input-group w-50">
-            <input type="text" name="search" class="form-control" placeholder="Search by title"
-                   th:value="${search != null ? search : ''}" aria-label="Search">
-            <button type="submit" class="btn btn-primary">Search</button>
+        <!-- Search bar -->
+        <form th:action="@{/books}" method="get" class="mb-3">
+            <div class="input-group w-50">
+                <input type="text" name="search" class="form-control" placeholder="Search by title"
+                       th:value="${search != null ? search : ''}" aria-label="Search">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        <div sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/books/add}" class="btn btn-primary mb-3">Add New Book</a>
         </div>
-    </form>
-
-    <div sec:authorize="hasRole('ADMIN')">
-        <a th:href="@{/books/add}" class="btn btn-primary mb-3">Add New Book</a>
-    </div>
-    <div th:if="${errorMessage}" class="alert alert-danger">
-        <span th:text="${errorMessage}"></span>
-    </div>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>
-                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
-                    ID
-                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
-                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
-                </a>
-            </th>
-
-            <th>
-                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='title,' + (${sort != null and sort.startsWith('title') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
-                    Title
-                    <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('asc')}">▲</span>
-                    <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('desc')}">▼</span>
-                </a>
-            </th>
-            <th>
-                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='isbn,' + (${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
-                    ISBN
-                    <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')}">▲</span>
-                    <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('desc')}">▼</span>
-                </a>
-            </th>
-            <th>
-                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='publishedDate,' + (${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
-                    Published Date
-                    <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')}">▲</span>
-                    <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('desc')}">▼</span>
-                </a></th>
-            <th>
-                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='price,' + (${sort != null and sort.startsWith('price') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
-                    Price
-                    <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('asc')}">▲</span>
-                    <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('desc')}">▼</span>
-                </a></th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${books}">
-            <td th:text="${book.id}"></td>
-            <td th:text="${book.title}"></td>
-            <td th:text="${book.isbn}"></td>
-            <td th:text="${book.publishedDate}"></td>
-            <td th:text="${book.price}"></td>
-            <td>
-                <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-sm btn-warning">Edit</a>
-                <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- Pagination-->
-    <div th:if="${totalPages > 0}">
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                <!-- Previous -->
-                <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{/books(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
-                       th:unless="${currentPage == 0}">Previous</a></li>
-
-                <!-- Page number -->
-                <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
-                    th:class="${p == currentPage} ? 'active'">
-                    <a class="page-link"
-                       th:href="@{/books(page=${p}, size=${size}, search=${search}, sort=${sort})}"
-                       th:text="${p + 1}">
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        ID
+                        <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
                     </a>
-                </li>
+                </th>
+                <th>
+                    <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='title,' + (${sort != null and sort.startsWith('title') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Title
+                        <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='isbn,' + (${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        ISBN
+                        <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='publishedDate,' + (${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Published Date
+                        <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='price,' + (${sort != null and sort.startsWith('price') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Price
+                        <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td>
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.isbn}"></td>
+                <td th:text="${#temporals.format(book.publishedDate, 'dd-MM-yyyy')}"></td>
+                <td th:text="${#numbers.formatDecimal(book.price, 2, 2)}"></td>
+                <td>
+                    <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-sm btn-warning">Edit</a>
+                    <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-                <!-- Next -->
-                <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
-                    <a class="page-link"
-                       th:href="@{/books(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
-                       th:unless="${currentPage + 1 == totalPages}">Next</a>
-                </li>
-            </ul>
-            <p class="text-center text-muted">Total items: <span th:text="${totalItems}"></span></p>
-        </nav>
+        <!-- Pagination -->
+        <div th:if="${totalPages > 0}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/books(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
+                           th:unless="${currentPage == 0}">Previous</a></li>
+                    <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:class="${p == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/books(page=${p}, size=${size}, search=${search}, sort=${sort})}"
+                           th:text="${p + 1}"></a>
+                    </li>
+                    <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/books(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
+                           th:unless="${currentPage + 1 == totalPages}">Next</a>
+                    </li>
+                </ul>
+                <p class="text-center text-muted">Total items: <span th:text="${totalItems}"></span></p>
+            </nav>
+        </div>
+        <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div>
     </div>
-    <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div>
-
 </div>
-</body>
 </html>

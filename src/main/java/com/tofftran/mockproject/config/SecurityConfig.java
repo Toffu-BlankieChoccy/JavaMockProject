@@ -47,7 +47,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    //Uncomment below to test api without authentication
+
+}
+
+
+//Uncomment below to test api without authentication
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
@@ -60,4 +64,3 @@ public class SecurityConfig {
 //                .logout(logout -> logout.disable());
 //        return http.build();
 //    }
-}

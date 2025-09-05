@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org">
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light" th:fragment="header">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">Library Management</a>
+        <div sec:authorize="isAuthenticated()">
+            <span sec:authentication="name"></span> |
+            <a th:href="@{/logout}">Logout</a>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/auth/login}" class="btn btn-outline-primary">Login</a>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
