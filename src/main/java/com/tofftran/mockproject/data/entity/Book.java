@@ -44,7 +44,7 @@ public class Book {
 
     @NotNull(message = "Price cannot be null")
     @PositiveOrZero(message = "Price must be a positive number")
-    private double Price;
+    private double price;
 
     private Instant createdOn;
     private Instant updatedOn;

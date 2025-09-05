@@ -24,10 +24,29 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
+            <th>
+                <a th:href="@{/users(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    ID
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th><a th:href="@{/users(page=${currentPage}, size=${size}, search=${search}, sort='name,' + (${sort != null and sort.startsWith('name') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                Name
+                <span th:if="${sort != null and sort.startsWith('name') and sort.endsWith('asc')}">▲</span>
+                <span th:if="${sort != null and sort.startsWith('name') and sort.endsWith('desc')}">▼</span>
+            </a>
+            </th>
+            <th><a th:href="@{/users(page=${currentPage}, size=${size}, search=${search}, sort='email,' + (${sort != null and sort.startsWith('email') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                Email
+                <span th:if="${sort != null and sort.startsWith('email') and sort.endsWith('asc')}">▲</span>
+                <span th:if="${sort != null and sort.startsWith('email') and sort.endsWith('desc')}">▼</span>
+            </a></th>
+            <th><a th:href="@{/users(page=${currentPage}, size=${size}, search=${search}, sort='phoneNumber,' + (${sort != null and sort.startsWith('phoneNumber') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                Phone
+                <span th:if="${sort != null and sort.startsWith('phoneNumber') and sort.endsWith('asc')}">▲</span>
+                <span th:if="${sort != null and sort.startsWith('phoneNumber') and sort.endsWith('desc')}">▼</span>
+            </a></th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -51,19 +70,16 @@
             <ul class="pagination justify-content-center">
                 <!-- Previous -->
                 <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                    <!--                    <a class="page-link" th:href="@{/users(page=${currentPage - 1}, size=${size})}"-->
-                    <!--                       th:unless="${currentPage == 0}">Previous</a>-->
                     <a class="page-link"
-                       th:href="@{/users(page=${currentPage - 1}, size=${size}, search=${search})}"
+                       th:href="@{/users(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
                        th:unless="${currentPage == 0}">Previous</a>
                 </li>
 
                 <!-- Page number -->
                 <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
                     th:class="${p == currentPage} ? 'active'">
-                    <!--                    <a class="page-link" th:href="@{/users(page=${p}, size=${size})}" th:text="${p + 1}">1</a>-->
                     <a class="page-link"
-                       th:href="@{/users(page=${p}, size=${size}, search=${search})}"
+                       th:href="@{/users(page=${p}, size=${size}, search=${search}, sort=${sort})}"
                        th:text="${p + 1}">
                     </a>
                 </li>
@@ -74,7 +90,7 @@
                     <!--                    <a class="page-link" th:href="@{/users(page=${currentPage + 1}, size=${size})}"-->
                     <!--                       th:unless="${currentPage + 1 == totalPages}">Next</a>-->
                     <a class="page-link"
-                       th:href="@{/users(page=${currentPage + 1}, size=${size}, search=${search})}"
+                       th:href="@{/users(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
                        th:unless="${currentPage + 1 == totalPages}">Next</a>
 
                 </li>
@@ -86,18 +102,3 @@
 </div>
 </body>
 </html>
-
-<script>
-    fetch('/api/books?page=0&size=5')
-        .then(response => response.json())
-        .then(data => {
-            const books = data.content;
-            let html = '<ul>';
-            books.forEach(book => {
-                html += `<li>${book.title} - $${book.price}</li>`;
-            });
-            html += '</ul>';
-            document.getElementById('bookList').innerHTML = html;
-        });
-</script>
-<div id="bookList"></div>

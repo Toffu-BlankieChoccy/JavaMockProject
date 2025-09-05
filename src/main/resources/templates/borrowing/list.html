@@ -16,18 +16,13 @@
                        th:value="${search != null ? search : ''}" aria-label="Search">
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
-<!--            <div class="col-auto">-->
-<!--                <select name="status" class="form-select">-->
-<!--                    <option value="" th:selected="${status == null}">All</option>-->
-<!--                    <option value="borrowed" th:selected="${status == 'borrowed'}">Borrowed</option>-->
-<!--                    <option value="returned" th:selected="${status == 'returned'}">Returned</option>-->
-<!--                </select>-->
-<!--            </div>-->
             <div class="col-auto">
-                <input type="date" name="startDate" class="form-control" th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd') : ''}">
+                <input type="date" name="startDate" class="form-control"
+                       th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd') : ''}">
             </div>
             <div class="col-auto">
-                <input type="date" name="endDate" class="form-control" th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd') : ''}">
+                <input type="date" name="endDate" class="form-control"
+                       th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd') : ''}">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Filter</button>
@@ -42,11 +37,40 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Book</th>
-            <th>User</th>
-            <th>Borrow Date</th>
-            <th>Return Date</th>
+            <th>
+                <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    ID
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='book.title,' + (${sort != null and sort.startsWith('book.title') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Book
+                    <span th:if="${sort != null and sort.startsWith('book.title') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('book.title') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='user.name,' + (${sort != null and sort.startsWith('user.name') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    User
+                    <span th:if="${sort != null and sort.startsWith('user.name') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('user.name') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='borrowDate,' + (${sort != null and sort.startsWith('borrowDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Borrow date
+                    <span th:if="${sort != null and sort.startsWith('borrowDate') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('borrowDate') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='returnDate,' + (${sort != null and sort.startsWith('returnDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Return date
+                    <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('desc')}">▼</span>
+                </a>
             <th>Actions</th>
         </tr>
         </thead>
@@ -72,21 +96,21 @@
                 <!-- Previous -->
                 <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/borrowings(page=${currentPage - 1}, size=${size}, search=${search})}"
-                       th:unless="${currentPage == 0}">Previous</a></li>                </li>
+                       th:href="@{/borrowings(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
+                       th:unless="${currentPage == 0}">Previous</a></li>
 
                 <!-- Page number -->
                 <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
                     th:class="${p == currentPage} ? 'active'">
                     <a class="page-link"
-                       th:href="@{/borrowings(page=${p}, size=${size}, search=${search})}"
+                       th:href="@{/borrowings(page=${p}, size=${size}, search=${search}, sort=${sort})}"
                        th:text="${p + 1}">
-                    </a>                </li>
+                    </a></li>
 
                 <!-- Next -->
                 <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/borrowings(page=${currentPage + 1}, size=${size}, search=${search})}"
+                       th:href="@{/borrowings(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
                        th:unless="${currentPage + 1 == totalPages}">Next</a>
                 </li>
             </ul>
@@ -94,6 +118,7 @@
         </nav>
     </div>
     <!-- No result pane -->
-    <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div></div>
+    <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div>
+</div>
 </body>
 </html>

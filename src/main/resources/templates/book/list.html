@@ -26,11 +26,40 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>ISBN</th>
-            <th>Published Date</th>
-            <th>Price</th>
+            <th>
+                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    ID
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+
+            <th>
+                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='title,' + (${sort != null and sort.startsWith('title') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Title
+                    <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('title') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='isbn,' + (${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    ISBN
+                    <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('isbn') and sort.endsWith('desc')}">▼</span>
+                </a>
+            </th>
+            <th>
+                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='publishedDate,' + (${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Published Date
+                    <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('publishedDate') and sort.endsWith('desc')}">▼</span>
+                </a></th>
+            <th>
+                <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='price,' + (${sort != null and sort.startsWith('price') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                    Price
+                    <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('asc')}">▲</span>
+                    <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('desc')}">▼</span>
+                </a></th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -56,14 +85,14 @@
                 <!-- Previous -->
                 <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/books(page=${currentPage - 1}, size=${size}, search=${search})}"
+                       th:href="@{/books(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
                        th:unless="${currentPage == 0}">Previous</a></li>
 
                 <!-- Page number -->
                 <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
                     th:class="${p == currentPage} ? 'active'">
                     <a class="page-link"
-                       th:href="@{/books(page=${p}, size=${size}, search=${search})}"
+                       th:href="@{/books(page=${p}, size=${size}, search=${search}, sort=${sort})}"
                        th:text="${p + 1}">
                     </a>
                 </li>
@@ -71,7 +100,7 @@
                 <!-- Next -->
                 <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/books(page=${currentPage + 1}, size=${size}, search=${search})}"
+                       th:href="@{/books(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
                        th:unless="${currentPage + 1 == totalPages}">Next</a>
                 </li>
             </ul>

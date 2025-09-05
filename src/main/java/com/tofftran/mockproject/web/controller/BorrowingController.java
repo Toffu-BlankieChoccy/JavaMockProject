@@ -41,9 +41,24 @@ public class BorrowingController {
                                  @RequestParam(defaultValue = "5") int size,
                                  @RequestParam(required = false) String search ,
                                  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate, Model model) {
+                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                 @RequestParam(required = false) String sort, Model model) {
         page = Math.max(0, page); //Negative page number validation
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Sort sortOrder = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length == 2) {
+                sortOrder = Sort.by(sortParams[0]).ascending();
+                if ("desc".equalsIgnoreCase(sortParams[1])) {
+                    sortOrder = Sort.by(sortParams[0]).descending();
+                }
+            }
+        } else {
+            sortOrder = Sort.by("id").descending(); // Default sort
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
 
         if ((search != null && !search.trim().isEmpty()) || startDate != null || endDate != null) {
@@ -67,6 +82,7 @@ public class BorrowingController {
         model.addAttribute("search", search);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
+        model.addAttribute("sort", sort);
         return "borrowing/list";
     }
 

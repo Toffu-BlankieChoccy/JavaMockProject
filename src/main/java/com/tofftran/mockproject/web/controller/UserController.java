@@ -28,9 +28,24 @@ public class UserController {
     @GetMapping
     public String listUsers(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
-                            @RequestParam(required = false) String search, Model model){
+                            @RequestParam(required = false) String search,
+                            @RequestParam(required = false) String sort, Model model){
         page = Math.max(0, page); //Negative page number validation
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+
+        Sort sortOrder = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length == 2) {
+                sortOrder = Sort.by(sortParams[0]).ascending();
+                if ("desc".equalsIgnoreCase(sortParams[1])) {
+                    sortOrder = Sort.by(sortParams[0]).descending();
+                }
+            }
+        } else {
+            sortOrder = Sort.by("id").descending(); // Default sort
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<UserDTO> userPage = userService.findAllUsers(pageable);
 
         if (search != null && !search.isEmpty()){
@@ -51,6 +66,7 @@ public class UserController {
         model.addAttribute("totalPages", userPage.getTotalPages());
         model.addAttribute("totalItems", userPage.getTotalElements());
         model.addAttribute("size", size);
+        model.addAttribute("sort", sort);
         model.addAttribute("search", search);
         return "user/list";
     }
