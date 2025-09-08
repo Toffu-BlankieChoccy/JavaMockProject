@@ -75,6 +75,13 @@
                         <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('asc')}">▲</span>
                         <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('desc')}">▼</span>
                     </a>
+                </th>
+                <th>
+                    <a th:href="@{/borrowings(page=${currentPage}, size=${size}, search=${search}, sort='dueDate,' + (${sort != null and sort.startsWith('dueDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Due date
+                        <span th:if="${sort != null and sort.startsWith('dueDate') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('dueDate') and sort.endsWith('desc')}">▼</span>
+                    </a></th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -85,9 +92,13 @@
                 <td th:text="${borrowing.userName}"></td>
                 <td th:text="${borrowing.borrowDate}"></td>
                 <td th:text="${borrowing.returnDate}"></td>
+                <td th:text="${borrowing.dueDate}"></td>
                 <td>
                     <a th:href="@{/borrowings/edit/{id}(id=${borrowing.id})}" class="btn btn-sm btn-warning">Edit</a>
                     <a th:href="@{/borrowings/delete/{id}(id=${borrowing.id})}" class="btn btn-sm btn-danger">Delete</a>
+                    <a th:if="${borrowing.returnDate} == null" class="btn btn-success"
+                       th:onclick="|returnBook(${borrowing.id})|">Return
+                    </a>
                 </td>
             </tr>
             </tbody>
@@ -125,4 +136,23 @@
         <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div>
     </div>
 </div>
+<!-- JavaScript for AJAX Return -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function returnBook(id) {
+        if (confirm('Are you sure you want to return this book?')) {
+            $.ajax({
+                url: '/api/borrowings/' + id + '/return',
+                type: 'PUT',
+                success: function() {
+                    alert('Book returned successfully!');
+                    location.reload();
+                },
+                error: function() {
+                    alert('Failed to return book.');
+                }
+            });
+        }
+    }
+</script>
 </html>

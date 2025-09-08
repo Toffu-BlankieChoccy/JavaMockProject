@@ -24,7 +24,7 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
     List<Borrowing> findByUser(User user);
 
 
-    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
+    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user " +
             "WHERE (:keyword IS NULL OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
@@ -35,17 +35,17 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
                                      @Param("endDate") LocalDate endDate,
                                      Pageable pageable);
 
-    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
+    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user " +
             "WHERE LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<BorrowingDTO> findByBookTitleOrUserName(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
+    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user")
     Page<BorrowingDTO> findAllBorrowingDTOs(Pageable pageable);
 
-    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
+    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user WHERE b.id = :id")
     Optional<BorrowingDTO> findBorrowingDTOById(@Param("id") Long id);
 }

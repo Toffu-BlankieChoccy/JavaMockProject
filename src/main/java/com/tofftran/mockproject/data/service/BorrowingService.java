@@ -85,6 +85,7 @@ public class BorrowingService {
         return convertToDTO(savedBorrowing);
     }
 
+
     @Transactional(readOnly = true)
     public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
         return borrowingRepository.findAllBorrowingDTOs(pageable);

@@ -46,12 +46,12 @@ public class Book {
     @PositiveOrZero(message = "Price must be a positive number")
     private double price;
 
+  @Column(nullable = true) // Temp null
     private boolean isAvailable;
 
     private Instant createdOn;
     private Instant updatedOn;
 
-    //@OneToMany(mappedBy = "templates/book", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Borrowing> borrowings = new ArrayList<>();
