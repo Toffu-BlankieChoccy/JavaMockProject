@@ -36,4 +36,8 @@ public class Borrowing {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate returnDate;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @NotNull(message = "Due date must be applied")
+    private LocalDate dueDate;
+
 }

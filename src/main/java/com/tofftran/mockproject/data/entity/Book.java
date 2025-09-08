@@ -46,6 +46,8 @@ public class Book {
     @PositiveOrZero(message = "Price must be a positive number")
     private double price;
 
+    private boolean isAvailable;
+
     private Instant createdOn;
     private Instant updatedOn;
 

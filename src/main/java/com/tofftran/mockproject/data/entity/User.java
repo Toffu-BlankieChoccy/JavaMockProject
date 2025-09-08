@@ -51,8 +51,6 @@ public class User {
         USER
     }
 
-
-    //@OneToMany(mappedBy = "templates/user", cascade = CascadeType.ALL, orphanRemoval = true)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Borrowing> borrowings = new ArrayList<>();

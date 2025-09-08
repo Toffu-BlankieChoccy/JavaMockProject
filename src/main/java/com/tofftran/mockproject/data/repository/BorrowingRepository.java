@@ -3,6 +3,7 @@ package com.tofftran.mockproject.data.repository;
 import com.tofftran.mockproject.data.dto.BorrowingDTO;
 import com.tofftran.mockproject.data.entity.Book;
 import com.tofftran.mockproject.data.entity.Borrowing;
+import com.tofftran.mockproject.data.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,19 +19,10 @@ import java.util.Optional;
 public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
     Page<Borrowing> findByBookAndReturnDateIsNull(Book book, Pageable pageable);
 
+    long countByUserAndReturnDateIsNull(User user); //Borrowing book count by user
 
-//    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
-//            "FROM Borrowing b JOIN b.book JOIN b.user " +
-//            "WHERE (:keyword IS NULL OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-//            "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
-//            "AND (:status IS NULL OR (:status = 'borrowed' AND b.returnDate IS NULL) OR (:status = 'returned' AND b.returnDate IS NOT NULL)) " +
-//            "AND (:startDate IS NULL OR b.borrowDate >= :startDate) " +
-//            "AND (:endDate IS NULL OR b.borrowDate <= :endDate)")
-//    Page<BorrowingDTO> findByFilters(@Param("keyword") String keyword,
-//                                     @Param("status") String status,
-//                                     @Param("startDate") LocalDate startDate,
-//                                     @Param("endDate") LocalDate endDate,
-//                                     Pageable pageable);
+    List<Borrowing> findByUser(User user);
+
 
     @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user " +

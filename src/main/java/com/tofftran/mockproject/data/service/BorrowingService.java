@@ -10,10 +10,12 @@ import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class BorrowingService {
@@ -23,6 +25,10 @@ public class BorrowingService {
 
     private final BookRepository bookRepository;
 
+    private static final int MAX_BORROW_LIMIT = 5;
+
+    private static final int DEFAULT_BORROW_DAYS = 7;
+
 
     public BorrowingService(BorrowingRepository borrowingRepository, UserRepository userRepository, BookRepository bookRepository) {
         this.borrowingRepository = borrowingRepository;
@@ -30,23 +36,7 @@ public class BorrowingService {
         this.bookRepository = bookRepository;
     }
 
-    @Transactional(readOnly = true)
-    public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
-        return borrowingRepository.findAllBorrowingDTOs(pageable);
-    }
-
-    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
-        return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
-    }
-
-
-    @Transactional(readOnly = true)
-    public BorrowingDTO findBorrowingById(Long id) {
-        return borrowingRepository.findBorrowingDTOById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
-    }
-
-    //For non api
+    //Create (non api)
     @Transactional
     public Borrowing createBorrowing(Borrowing borrowing) {
         // Validate book and user existence
@@ -70,7 +60,7 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
-    //For api
+    //Create (api)
     @Transactional
     public BorrowingDTO postBorrowing(BorrowingDTO borrowingDTO) {
         Book book = bookRepository.findById(borrowingDTO.getBookId())
@@ -96,12 +86,30 @@ public class BorrowingService {
     }
 
     @Transactional(readOnly = true)
+    public Page<BorrowingDTO> findAllBorrowings(Pageable pageable) {
+        return borrowingRepository.findAllBorrowingDTOs(pageable);
+    }
+
+    //Find by book title or user's name
+    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
+        return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
+    }
+
+    //Find by ID
+    @Transactional(readOnly = true)
+    public BorrowingDTO findBorrowingById(Long id) {
+        return borrowingRepository.findBorrowingDTOById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
+    }
+
+    //Filters
+    @Transactional(readOnly = true)
     public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         return borrowingRepository.findByFilters(keyword, startDate, endDate, pageable);
     }
 
 
-    //For non api
+    //Update (non api)
     @Transactional
     public Borrowing updateBorrowing(Long id, BorrowingDTO borrowingDetails) {
         Borrowing borrowing = borrowingRepository.findById(id)
@@ -131,7 +139,7 @@ public class BorrowingService {
         return borrowingRepository.save(borrowing);
     }
 
-    //For api
+    //Update (api)
     @Transactional
     public BorrowingDTO putBorrowing(Long id, BorrowingDTO borrowingDTO) {
         Borrowing borrowing = borrowingRepository.findById(id)
@@ -175,7 +183,52 @@ public class BorrowingService {
                 borrowing.getUser().getId(),
                 borrowing.getUser().getName(),
                 borrowing.getBorrowDate(),
-                borrowing.getReturnDate()
+                borrowing.getReturnDate(),
+                borrowing.getDueDate()
         );
+    }
+
+    @Transactional
+    public Borrowing borrowBook(Long userId, Long bookId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+        if (!book.isAvailable()) {
+            throw new IllegalStateException("Book is not available");
+        }
+
+        long currentBorrowings = borrowingRepository.countByUserAndReturnDateIsNull(user);
+        if (currentBorrowings >= MAX_BORROW_LIMIT) {
+            throw new IllegalStateException("You have reached the maximum borrow limit");
+        }
+
+        Borrowing borrowing = new Borrowing();
+        borrowing.setUser(user);
+        borrowing.setBook(book);
+        borrowing.setBorrowDate(LocalDate.now());
+        borrowing.setDueDate(LocalDate.now().plusDays(DEFAULT_BORROW_DAYS)); // 7 ngày mượn
+        borrowingRepository.save(borrowing);
+
+        return borrowing;
+    }
+
+    @Transactional
+    public Borrowing returnBook(Long borrowingId) {
+        Borrowing borrowing = borrowingRepository.findById(borrowingId).orElseThrow(() -> new ResourceNotFoundException("Borrowing not found"));
+
+        if (borrowing.getReturnDate() != null) {
+            throw new IllegalStateException("Book already returned");
+        }
+
+        borrowing.setReturnDate(LocalDate.now());
+        borrowingRepository.save(borrowing);
+
+        return borrowing;
+    }
+
+    public String getBorrowingStatus(Borrowing borrowing) {
+        if (borrowing.getReturnDate() != null) return "RETURNED";
+        if (borrowing.getDueDate().isBefore(LocalDate.now()) && borrowing.getReturnDate() == null) return "OVERDUE";
+        return "BORROWED";
     }
 }
