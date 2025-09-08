@@ -96,7 +96,6 @@
                       <a class="page-link"
                            th:href="@{/users(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
                            th:unless="${currentPage + 1 == totalPages}">Next</a>
-
                     </li>
                 </ul>
                 <p class="text-center text-muted">Total items: <span th:text="${totalItems}"></span></p>

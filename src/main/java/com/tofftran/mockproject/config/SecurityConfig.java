@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 .usernameParameter("email")
                                 .passwordParameter("password")
                                 .permitAll()
-                                .defaultSuccessUrl("/home", true)
+                                .defaultSuccessUrl("/books", true)
                                 .failureUrl("/auth/login?error")
                 )
                 .logout(logout ->

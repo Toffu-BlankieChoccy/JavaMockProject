@@ -15,3 +15,8 @@ color: #007bff;
 font-size: 0.8em;
 vertical-align: middle;
 }
+
+.navbar .nav-link.active {
+    font-weight: bold;
+    background-color: #e9ecef;
+}
