@@ -109,6 +109,13 @@ public class BorrowingService {
         return borrowingRepository.findByFilters(keyword, startDate, endDate, pageable);
     }
 
+    public Page<Borrowing> findByUserWithFilters(Long userId, String keyword, LocalDate dueDateFilter, LocalDate returnDateFilter, Pageable pageable) {
+        User user = new User(); // Giả sử có cách lấy User từ userId, cần tiêm UserRepository
+        user.setId(userId); // Set userId để lọc
+
+        // Xây dựng query động
+        return borrowingRepository.findByUserAndFilters(user, keyword, dueDateFilter, returnDateFilter, pageable);
+    }
 
     //Update (non api)
     @Transactional
@@ -176,18 +183,7 @@ public class BorrowingService {
         borrowingRepository.deleteById(id);
     }
 
-    private BorrowingDTO convertToDTO(Borrowing borrowing) {
-        return new BorrowingDTO(
-                borrowing.getId(),
-                borrowing.getBook().getId(),
-                borrowing.getBook().getTitle(),
-                borrowing.getUser().getId(),
-                borrowing.getUser().getName(),
-                borrowing.getBorrowDate(),
-                borrowing.getReturnDate(),
-                borrowing.getDueDate()
-        );
-    }
+
 
     @Transactional
     public Borrowing borrowBook(Long userId, Long bookId) {
@@ -242,5 +238,18 @@ public class BorrowingService {
         if (borrowing.getReturnDate() != null) return "RETURNED";
         if (borrowing.getDueDate().isBefore(LocalDate.now()) && borrowing.getReturnDate() == null) return "OVERDUE";
         return "BORROWED";
+    }
+
+    private BorrowingDTO convertToDTO(Borrowing borrowing) {
+        return new BorrowingDTO(
+                borrowing.getId(),
+                borrowing.getBook().getId(),
+                borrowing.getBook().getTitle(),
+                borrowing.getUser().getId(),
+                borrowing.getUser().getName(),
+                borrowing.getBorrowDate(),
+                borrowing.getReturnDate(),
+                borrowing.getDueDate()
+        );
     }
 }

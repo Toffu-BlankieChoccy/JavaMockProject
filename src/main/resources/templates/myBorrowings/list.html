@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head>
+    <title>Book List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<div layout:fragment="content">
+    <div class="container">
+        <h1>My Borrowings</h1>
+
+        <!-- Search and Filter -->
+        <form th:action="@{/myBorrowings}" method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Search by title or ISBN"
+                           th:value="${search != null ? search : ''}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="dueDate" class="form-control" th:value="${dueDate}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="returnDate" class="form-control" th:value="${returnDate}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>
+                    <a th:href="@{/myBorrowings(page=${currentPage}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        ID
+                        <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/myBorrowings(page=${currentPage}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort='book.title,' + (${sort != null and sort.startsWith('book.title') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Title
+                        <span th:if="${sort != null and sort.startsWith('book.title') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('book.title') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>Borrow Date</th>
+                <th>
+                    <a th:href="@{/myBorrowings(page=${currentPage}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort='dueDate,' + (${sort != null and sort.startsWith('dueDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Due Date
+                        <span th:if="${sort != null and sort.startsWith('dueDate') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('dueDate') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/myBorrowings(page=${currentPage}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort='returnDate,' + (${sort != null and sort.startsWith('returnDate') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
+                        Return Date
+                        <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('asc')}">▲</span>
+                        <span th:if="${sort != null and sort.startsWith('returnDate') and sort.endsWith('desc')}">▼</span>
+                    </a>
+                </th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="borrowing : ${borrowings}">
+                <td th:text="${borrowing.id}"></td>
+                <td th:text="${borrowing.bookTitle}"></td>
+                <td th:text="${#temporals.format(borrowing.borrowDate, 'dd-MM-yyyy')}"></td>
+                <td th:text="${#temporals.format(borrowing.dueDate, 'dd-MM-yyyy')}"></td>
+                <td th:text="${borrowing.returnDate != null ? #temporals.format(borrowing.returnDate, 'dd-MM-yyyy') : 'Not returned'}"></td>
+                <td>
+                    <div sec:authorize="hasRole('USER')">
+                        <a th:if="${borrowing.returnDate == null}"
+                           th:href="@{/api/borrowings/{id}/return(id=${borrowing.id})}" class="btn btn-sm btn-success">Return</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div th:if="${totalPages > 0}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/myBorrowings(page=${currentPage - 1}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort=${sort})}"
+                           th:unless="${currentPage == 0}">Previous</a>
+                    </li>
+                    <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:class="${p == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/myBorrowings(page=${p}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort=${sort})}"
+                           th:text="${p + 1}"></a>
+                    </li>
+                    <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
+                        <a class="page-link"
+                           th:href="@{/myBorrowings(page=${currentPage + 1}, size=${size}, search=${search}, dueDate=${dueDate}, returnDate=${returnDate}, sort=${sort})}"
+                           th:unless="${currentPage + 1 == totalPages}">Next</a>
+                    </li>
+                </ul>
+                <p class="text-center text-muted">Total items: <span th:text="${totalItems}"></span></p>
+            </nav>
+        </div>
+        <div th:if="${totalPages == 0}" class="text-center text-muted">No borrowings found.</div>
+    </div>
+
+    <script>
+        function borrowBook(userId, bookId) {
+          if (!confirm('Are you sure you want to borrow this book?')) return;
+
+          $.ajax({
+            url: '/api/borrowings/borrow?userId=' + userId + '&bookId=' + bookId,
+            type: 'POST',
+            success: function(response) {
+              console.log("Success:", response);
+              alert('Book borrowed successfully!');
+              location.reload();
+            },
+            error: function(xhr) {
+              let errorMessage = xhr.responseJSON ? xhr.responseJSON.errorMessage : 'Unknown error occurred';
+              alert('Failed to borrow book: ' + errorMessage);
+            }
+          });
+        }
+    </script>
+
+</div>
+</html>

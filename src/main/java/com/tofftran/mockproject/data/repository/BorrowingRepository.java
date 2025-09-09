@@ -23,6 +23,16 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
 
     List<Borrowing> findByUser(User user);
 
+    @Query("SELECT b FROM Borrowing b WHERE b.user = :user " +
+            "AND (:keyword IS NULL OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.book.isbn) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND (:dueDateFilter IS NULL OR b.dueDate = :dueDateFilter) " +
+            "AND (:returnDateFilter IS NULL OR b.returnDate = :returnDateFilter OR (:returnDateFilter IS NOT NULL AND b.returnDate IS NULL))")
+    Page<Borrowing> findByUserAndFilters(
+            @Param("user") User user,
+            @Param("keyword") String keyword,
+            @Param("dueDateFilter") LocalDate dueDateFilter,
+            @Param("returnDateFilter") LocalDate returnDateFilter,
+            Pageable pageable);
 
     @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user " +
