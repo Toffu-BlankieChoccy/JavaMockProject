@@ -213,9 +213,24 @@ public class BorrowingService {
         return borrowing;
     }
 
+//    @Transactional
+//    public Borrowing returnBook(Long borrowingId) {
+//        Borrowing borrowing = borrowingRepository.findById(borrowingId).orElseThrow(() -> new ResourceNotFoundException("Borrowing not found"));
+//
+//        if (borrowing.getReturnDate() != null) {
+//            throw new IllegalStateException("Book already returned");
+//        }
+//
+//        borrowing.setReturnDate(LocalDate.now());
+//        borrowingRepository.save(borrowing);
+//
+//        return borrowing;
+//    }
+
     @Transactional
-    public Borrowing returnBook(Long borrowingId) {
-        Borrowing borrowing = borrowingRepository.findById(borrowingId).orElseThrow(() -> new ResourceNotFoundException("Borrowing not found"));
+    public BorrowingDTO returnBook(Long borrowingId) {
+        Borrowing borrowing = borrowingRepository.findById(borrowingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found"));
 
         if (borrowing.getReturnDate() != null) {
             throw new IllegalStateException("Book already returned");
@@ -224,7 +239,16 @@ public class BorrowingService {
         borrowing.setReturnDate(LocalDate.now());
         borrowingRepository.save(borrowing);
 
-        return borrowing;
+        return new BorrowingDTO(
+                borrowing.getId(),
+                borrowing.getBook().getId(),
+                borrowing.getBook().getTitle(),
+                borrowing.getUser().getId(),
+                borrowing.getUser().getName(),
+                borrowing.getBorrowDate(),
+                borrowing.getReturnDate(),
+                borrowing.getDueDate()
+        );
     }
 
     public String getBorrowingStatus(Borrowing borrowing) {

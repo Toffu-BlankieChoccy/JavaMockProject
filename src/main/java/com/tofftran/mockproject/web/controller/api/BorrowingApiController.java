@@ -86,9 +86,9 @@ public class BorrowingApiController {
     }
 
     @PutMapping("/{id}/return")
-    public ResponseEntity<Borrowing> returnBook(@PathVariable Long id) {
+    public ResponseEntity<BorrowingDTO> returnBook(@PathVariable Long id) {
         try {
-            Borrowing borrowing = borrowingService.returnBook(id);
+            BorrowingDTO borrowing = borrowingService.returnBook(id);
             return ResponseEntity.ok(borrowing);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(null);

@@ -40,6 +40,7 @@ public class BookApiController {
         return ResponseEntity.status(201).body(book);
     }
 
+
     @PutMapping("/{id}")
     public ResponseEntity<Book> update(@PathVariable Long id, @RequestBody Book bookDetails){
         Book book = bookService.updateBook(id, bookDetails);

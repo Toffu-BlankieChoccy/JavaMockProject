@@ -134,25 +134,28 @@
         </div>
         <!-- No result pane -->
         <div th:if="${totalPages == 0}" class="text-center text-muted">No results found.</div>
+
+        <!-- JavaScript for AJAX Return -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            function returnBook(id) {
+                if (confirm('Are you sure you want to return this book?')) {
+                    $.ajax({
+                        url: '/api/borrowings/' + id + '/return',
+                        type: 'PUT',
+                        success: function() {
+                            alert('Book returned successfully!');
+                            location.reload();
+                        },
+                        error: function() {
+                            alert('Failed to return book.');
+                        }
+                    });
+                }
+            }
+        </script>
     </div>
 </div>
-<!-- JavaScript for AJAX Return -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function returnBook(id) {
-        if (confirm('Are you sure you want to return this book?')) {
-            $.ajax({
-                url: '/api/borrowings/' + id + '/return',
-                type: 'PUT',
-                success: function() {
-                    alert('Book returned successfully!');
-                    location.reload();
-                },
-                error: function() {
-                    alert('Failed to return book.');
-                }
-            });
-        }
-    }
-</script>
+
+
 </html>
