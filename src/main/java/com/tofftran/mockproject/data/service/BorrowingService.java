@@ -92,7 +92,7 @@ public class BorrowingService {
     }
 
     //Find by book title or user's name
-    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable){
+    public Page<BorrowingDTO> findByBookTitleOrUserName(String keyword, Pageable pageable) {
         return borrowingRepository.findByBookTitleOrUserName(keyword, pageable);
     }
 
@@ -207,25 +207,12 @@ public class BorrowingService {
         borrowing.setUser(user);
         borrowing.setBook(book);
         borrowing.setBorrowDate(LocalDate.now());
-        borrowing.setDueDate(LocalDate.now().plusDays(DEFAULT_BORROW_DAYS)); // 7 ngày mượn
+        borrowing.setDueDate(LocalDate.now().plusDays(DEFAULT_BORROW_DAYS)); // 7 days
         borrowingRepository.save(borrowing);
 
         return borrowing;
     }
 
-//    @Transactional
-//    public Borrowing returnBook(Long borrowingId) {
-//        Borrowing borrowing = borrowingRepository.findById(borrowingId).orElseThrow(() -> new ResourceNotFoundException("Borrowing not found"));
-//
-//        if (borrowing.getReturnDate() != null) {
-//            throw new IllegalStateException("Book already returned");
-//        }
-//
-//        borrowing.setReturnDate(LocalDate.now());
-//        borrowingRepository.save(borrowing);
-//
-//        return borrowing;
-//    }
 
     @Transactional
     public BorrowingDTO returnBook(Long borrowingId) {

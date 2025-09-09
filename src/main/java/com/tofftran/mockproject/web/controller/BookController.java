@@ -1,8 +1,12 @@
 package com.tofftran.mockproject.web.controller;
 
 import com.tofftran.mockproject.data.entity.Book;
+import com.tofftran.mockproject.data.entity.User;
+import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.data.service.BookService;
+import com.tofftran.mockproject.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,10 +17,17 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/books")
 public class BookController {
+    @Autowired
     private final BookService bookService;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
@@ -27,7 +38,9 @@ public class BookController {
     public String listBooks(@RequestParam(defaultValue = "0") int page,
                             @RequestParam(defaultValue = "5") int size,
                             @RequestParam(required = false) String search,
-                            @RequestParam(required = false) String sort,Model model){
+                            @RequestParam(required = false) String sort,
+                            Model model,
+                            Principal principal){
         page = Math.max(0, page); //Negative page number validation
 
         Sort sortOrder = Sort.unsorted();
@@ -67,6 +80,16 @@ public class BookController {
         model.addAttribute("totalItems", bookPage.getTotalElements());
         model.addAttribute("search", search);
         model.addAttribute("sort", sort);
+
+        // Thêm userId vào model nếu user đã đăng nhập
+        if (principal != null) {
+            String email = principal.getName();
+            User user = userRepository.findPreciseEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+            model.addAttribute("userId", user.getId());
+        }
+
+
         return "book/list";
     }
 

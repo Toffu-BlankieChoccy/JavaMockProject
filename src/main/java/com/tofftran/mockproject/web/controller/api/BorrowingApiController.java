@@ -11,47 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/borrowings")
 public class BorrowingApiController {
-//    private final BorrowingService borrowingService;
-//
-//    public BorrowingApiController(BorrowingService borrowingService) {
-//        this.borrowingService = borrowingService;
-//    }
-//
-//    @GetMapping
-//    public ResponseEntity<Page<BorrowingDTO>> getAllBorrowings(Pageable pageable){
-//        Page<BorrowingDTO> borrowingDTOS = borrowingService.findAllBorrowings(pageable);
-//        return ResponseEntity.ok(borrowingDTOS);
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<BorrowingDTO> getBorrowingById(@PathVariable Long id){
-//        BorrowingDTO borrowingDTO = borrowingService.findBorrowingById(id);
-//        return ResponseEntity.ok(borrowingDTO);
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<BorrowingDTO> createBorrowing(@RequestBody BorrowingDTO borrowingDTODetails){
-//        BorrowingDTO borrowingDTO = borrowingService.postBorrowing(borrowingDTODetails);
-//        return ResponseEntity.status(201).body(borrowingDTO);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<BorrowingDTO> updateBorrowing(@PathVariable Long id, @RequestBody BorrowingDTO borrowingDetails){
-//        BorrowingDTO borrowingDTO = borrowingService.putBorrowing(id, borrowingDetails);
-//        return ResponseEntity.status(201).body(borrowingDTO);
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<BorrowingDTO> deleteBorrowing(@PathVariable Long id){
-//        borrowingService.deleteBorrowing(id);
-//        return ResponseEntity.noContent().build();
-//    }
-
     @Autowired
     private BorrowingService borrowingService;
 
@@ -75,15 +38,6 @@ public class BorrowingApiController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<Borrowing> borrowBook(@RequestParam Long userId, @RequestParam Long bookId) {
-        try {
-            Borrowing borrowing = borrowingService.borrowBook(userId, bookId);
-            return ResponseEntity.ok(borrowing);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
 
     @PutMapping("/{id}/return")
     public ResponseEntity<BorrowingDTO> returnBook(@PathVariable Long id) {
@@ -93,5 +47,35 @@ public class BorrowingApiController {
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+
+    @PostMapping("/borrow")
+    public ResponseEntity<?> borrowBook(@RequestParam Long userId,
+                                        @RequestParam Long bookId) {
+        try {
+
+            System.out.println("Borrowing book - User ID: " + userId + ", Book ID: " + bookId); // Debug log
+            Borrowing borrowing = borrowingService.borrowBook(userId, bookId);
+            BorrowingDTO borrowingDTO = new BorrowingDTO(
+                    borrowing.getId(),
+                    borrowing.getBook().getId(),
+                    borrowing.getBook().getTitle(),
+                    borrowing.getUser().getId(),
+                    borrowing.getUser().getName(),
+                    borrowing.getBorrowDate(),
+                    borrowing.getReturnDate(),
+                    borrowing.getDueDate()
+            );
+            return ResponseEntity.status(201).body(borrowingDTO);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<BorrowingDTO> deleteBorrowing(@PathVariable Long id) {
+        borrowingService.deleteBorrowing(id);
+        return ResponseEntity.noContent().build();
     }
 }
