@@ -39,9 +39,10 @@ public class BorrowingController {
     @Transactional(readOnly = true)
     public String listBorrowings(@RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "5") int size,
-                                 @RequestParam(required = false) String search ,
-                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                 @RequestParam(required = false) String search,
+                                 @RequestParam(required = false) String status,
+//1                                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//1                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                  @RequestParam(required = false) String sort, Model model) {
         page = Math.max(0, page); //Negative page number validation
 
@@ -61,17 +62,25 @@ public class BorrowingController {
         Pageable pageable = PageRequest.of(page, size, sortOrder);
         Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
 
-        if ((search != null && !search.trim().isEmpty()) || startDate != null || endDate != null) {
-            borrowingPage = borrowingService.findByFilters(search, startDate, endDate, pageable);
+//1        if ((search != null && !search.trim().isEmpty()) || startDate != null || endDate != null) {
+//            borrowingPage = borrowingService.findByFilters(search, startDate, endDate, status, pageable);
+//        }
+//        else borrowingPage = borrowingService.findAllBorrowings(pageable);
+
+        if ((search != null && !search.trim().isEmpty()) || (status != null && !status.isEmpty())) {
+            borrowingPage = borrowingService.findByFilters(search, status, pageable);
         }
-        else borrowingPage = borrowingService.findAllBorrowings(pageable);
-        // Check if page is out of scope
+//        else borrowingPage = borrowingService.findAllBorrowings(pageable);
+
+
+            // Check if page is out of scope
         if (page > borrowingPage.getTotalPages() - 1 && borrowingPage.getTotalPages() > 0) {
             model.addAttribute("errorMessage", "Page index out of range. Redirected to last page.");
             return "redirect:/borrowings?page=" + (borrowingPage.getTotalPages() - 1) + "&size=" + size +
                     (search != null ? "&search=" + search : "") +
-                    (startDate != null ? "&startDate=" + startDate : "") +
-                    (endDate != null ? "&endDate=" + endDate : "");
+                    (status != null ? "&status=" + status : "");
+//1                   + (startDate != null ? "&startDate=" + startDate : "") +
+//                    (endDate != null ? "&endDate=" + endDate : "");
         }
 
         model.addAttribute("borrowings", borrowingPage.getContent());
@@ -80,8 +89,9 @@ public class BorrowingController {
         model.addAttribute("totalItems", borrowingPage.getTotalElements());
         model.addAttribute("size", size);
         model.addAttribute("search", search);
-        model.addAttribute("startDate", startDate);
-        model.addAttribute("endDate", endDate);
+//        model.addAttribute("startDate", startDate);
+//        model.addAttribute("endDate", endDate);
+        model.addAttribute("status", status);
         model.addAttribute("sort", sort);
         return "borrowing/list";
     }

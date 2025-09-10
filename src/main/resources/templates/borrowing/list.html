@@ -20,17 +20,24 @@
                            th:value="${search != null ? search : ''}" aria-label="Search">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </div>
+
                 <div class="col-auto">
-                    <input type="date" name="startDate" class="form-control"
-                           th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd') : ''}">
+                    <select onchange="this.form.submit()" name="status" class="form-select">
+                        <option value="" th:selected="${status == null}">All</option>
+                        <option value="RETURNED" th:selected="${status == 'RETURNED'}">Returned</option>
+                        <option value="NOT_RETURNED" th:selected="${status == 'NOT_RETURNED'}">Not Returned</option>
+                        <option value="OVERDUE" th:selected="${status == 'OVERDUE'}">Overdue</option>
+                    </select>
                 </div>
-                <div class="col-auto">
-                    <input type="date" name="endDate" class="form-control"
-                           th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd') : ''}">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
+                <!--                <div class="col-auto">-->
+                <!--                    <input type="date" name="startDate" class="form-control"-->
+                <!--                           th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd') : ''}">-->
+                <!--                </div>-->
+                <!--                <div class="col-auto">-->
+                <!--                    <input type="date" name="endDate" class="form-control"-->
+                <!--                           th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd') : ''}">-->
+                <!--                </div>-->
+
             </div>
         </form>
 
@@ -111,21 +118,21 @@
                     <!-- Previous -->
                     <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{/borrowings(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort})}"
+                           th:href="@{/borrowings(page=${currentPage - 1}, size=${size}, search=${search}, sort=${sort}, status=${status})}"
                            th:unless="${currentPage == 0}">Previous</a></li>
 
                     <!-- Page number -->
                     <li class="page-item" th:each="p : ${#numbers.sequence(0, totalPages - 1)}"
                         th:class="${p == currentPage} ? 'active'">
                         <a class="page-link"
-                           th:href="@{/borrowings(page=${p}, size=${size}, search=${search}, sort=${sort})}"
+                           th:href="@{/borrowings(page=${p}, size=${size}, search=${search}, sort=${sort}, status=${status})}"
                            th:text="${p + 1}">
                         </a></li>
 
                     <!-- Next -->
                     <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
                         <a class="page-link"
-                           th:href="@{/borrowings(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort})}"
+                           th:href="@{/borrowings(page=${currentPage + 1}, size=${size}, search=${search}, sort=${sort}, status=${status})}"
                            th:unless="${currentPage + 1 == totalPages}">Next</a>
                     </li>
                 </ul>

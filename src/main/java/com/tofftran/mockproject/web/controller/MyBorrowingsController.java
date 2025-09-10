@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
@@ -38,15 +39,13 @@ public class MyBorrowingsController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String status,
             Model model) {
         page = Math.max(0, page); //Negative page number validation
 
         // Get userId from userDetails
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        //Long userId = 1L; // Thay bằng logic lấy userId thực tế
 
         Sort sortOrder = Sort.unsorted();
         if (sort != null && !sort.isEmpty()) {
@@ -62,19 +61,14 @@ public class MyBorrowingsController {
         }
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+        Page<BorrowingDTO> borrowingPage = borrowingService.findByUserWithFilters(user.getId(), search, status, pageable);
 
-        if ((search != null && !search.trim().isEmpty()) || startDate != null || endDate != null) {
-            borrowingPage = borrowingService.findByFilters(search, startDate, endDate, pageable);
-        }
-        else borrowingPage = borrowingService.findAllBorrowings(pageable);
         // Check if page is out of scope
         if (page > borrowingPage.getTotalPages() - 1 && borrowingPage.getTotalPages() > 0) {
             model.addAttribute("errorMessage", "Page index out of range. Redirected to last page.");
-            return "redirect:/borrowings?page=" + (borrowingPage.getTotalPages() - 1) + "&size=" + size +
+            return "redirect:/myBorrowings?page=" + (borrowingPage.getTotalPages() - 1) + "&size=" + size +
                     (search != null ? "&search=" + search : "") +
-                    (startDate != null ? "&startDate=" + startDate : "") +
-                    (endDate != null ? "&endDate=" + endDate : "");
+                    (status != null ? "&status=" + status : "");
         }
 
         model.addAttribute("borrowings", borrowingPage.getContent());
@@ -84,8 +78,7 @@ public class MyBorrowingsController {
         model.addAttribute("totalItems", borrowingPage.getTotalElements());
         model.addAttribute("search", search);
         model.addAttribute("sort", sort);
-        model.addAttribute("dueDate", borrowingPage);
-        model.addAttribute("returnDate", borrowingPage);
+        model.addAttribute("status", status);
 
         return "myBorrowings/list";
     }

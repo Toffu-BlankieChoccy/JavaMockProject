@@ -5,12 +5,17 @@ import com.tofftran.mockproject.data.entity.Borrowing;
 import com.tofftran.mockproject.data.service.BorrowingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/borrowings")
@@ -18,14 +23,84 @@ public class BorrowingApiController {
     @Autowired
     private BorrowingService borrowingService;
 
+    // Endpoint cho cả view và AJAX
     @GetMapping
-    public ResponseEntity<Page<BorrowingDTO>> getAllBorrowings(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            Pageable pageable) {
-        Page<BorrowingDTO> borrowings = borrowingService.findByFilters(keyword, startDate, endDate, pageable);
-        return ResponseEntity.ok(borrowings);
+    @ResponseBody
+    public String listBorrowings(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "5") int size,
+                                 @RequestParam(required = false) String search,
+                                 @RequestParam(required = false) String status,
+                                 @RequestParam(required = false) String sort,
+                                 Model model,
+                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith) {
+        Sort sortOrder = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length == 2) {
+                sortOrder = Sort.by(sortParams[0]).ascending();
+                if ("desc".equalsIgnoreCase(sortParams[1])) {
+                    sortOrder = Sort.by(sortParams[0]).descending();
+                }
+            }
+        } else {
+            sortOrder = Sort.by("id").descending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+
+        if ((search != null && !search.trim().isEmpty()) || (status != null && !status.isEmpty())) {
+            borrowingPage = borrowingService.findByFilters(search, status, pageable);
+        }
+
+        // Nếu không phải AJAX, trả về view
+        model.addAttribute("borrowings", borrowingPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", borrowingPage.getTotalPages());
+        model.addAttribute("totalItems", borrowingPage.getTotalElements());
+        model.addAttribute("size", size);
+        model.addAttribute("search", search);
+        model.addAttribute("status", status);
+        model.addAttribute("sort", sort);
+        return "borrowing/apiListTest"; // Trả về template apiListTest.html
+    }
+
+    // Endpoint riêng cho AJAX (tuỳ chọn)
+    @GetMapping("/data")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getBorrowings(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "5") int size,
+                                                             @RequestParam(required = false) String search,
+                                                             @RequestParam(required = false) String status,
+                                                             @RequestParam(required = false) String sort) {
+        Sort sortOrder = Sort.unsorted();
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParams = sort.split(",");
+            if (sortParams.length == 2) {
+                sortOrder = Sort.by(sortParams[0]).ascending();
+                if ("desc".equalsIgnoreCase(sortParams[1])) {
+                    sortOrder = Sort.by(sortParams[0]).descending();
+                }
+            }
+        } else {
+            sortOrder = Sort.by("id").descending();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
+        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+
+        if ((search != null && !search.trim().isEmpty()) || (status != null && !status.isEmpty())) {
+            borrowingPage = borrowingService.findByFilters(search, status, pageable);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", borrowingPage.getContent());
+        response.put("currentPage", borrowingPage.getNumber());
+        response.put("totalPages", borrowingPage.getTotalPages());
+        response.put("totalItems", borrowingPage.getTotalElements());
+        response.put("size", borrowingPage.getSize());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

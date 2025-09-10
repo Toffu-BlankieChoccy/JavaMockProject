@@ -9,6 +9,7 @@ import com.tofftran.mockproject.data.repository.BorrowingRepository;
 import com.tofftran.mockproject.data.repository.UserRepository;
 import com.tofftran.mockproject.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -105,16 +106,21 @@ public class BorrowingService {
 
     //Filters
     @Transactional(readOnly = true)
-    public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, Pageable pageable) {
-        return borrowingRepository.findByFilters(keyword, startDate, endDate, pageable);
+//1    public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, String status, Pageable pageable) {
+    public Page<BorrowingDTO> findByFilters(String keyword, String status, Pageable pageable) {
+
+//1        return borrowingRepository.findByFilters(keyword, startDate, endDate, status,pageable);
+        return borrowingRepository.findByFilters(keyword, status,pageable);
     }
 
-    public Page<Borrowing> findByUserWithFilters(Long userId, String keyword, LocalDate dueDateFilter, LocalDate returnDateFilter, Pageable pageable) {
-        User user = new User(); // Giả sử có cách lấy User từ userId, cần tiêm UserRepository
-        user.setId(userId); // Set userId để lọc
 
-        // Xây dựng query động
-        return borrowingRepository.findByUserAndFilters(user, keyword, dueDateFilter, returnDateFilter, pageable);
+    public Page<BorrowingDTO> findByUserWithFilters(Long userId, String keyword, String status, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        LocalDate currentDate = LocalDate.now();
+        //return borrowingRepository.findByUserAndFilters(user, keyword, status, currentDate, pageable);
+        return borrowingRepository.findByUserAndFilters(user, keyword, currentDate, pageable);
+
     }
 
     //Update (non api)
@@ -182,7 +188,6 @@ public class BorrowingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Borrowing not found with id: " + id));
         borrowingRepository.deleteById(id);
     }
-
 
 
     @Transactional
