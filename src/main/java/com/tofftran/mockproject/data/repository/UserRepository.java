@@ -20,8 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByNameOrEmail(String keyword, Pageable pageable);
 
 
-    @Query("SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    Optional<User> findByEmail(String keyword);
+//    @Query("SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Optional<User> findByEmail(String email);
 
 
     //To find principle user id --- for authorization

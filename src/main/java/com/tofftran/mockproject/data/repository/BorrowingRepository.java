@@ -23,35 +23,19 @@ public interface BorrowingRepository extends JpaRepository<Borrowing, Long> {
 
     List<Borrowing> findByUser(User user);
 
-
     @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
             "FROM Borrowing b JOIN b.book JOIN b.user " +
-            "WHERE b.user = :user " +
-            "AND (:keyword IS NULL OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.book.isbn) LIKE LOWER(CONCAT('%', :keyword, '%'))) "
-
-            + "AND (:status IS NULL OR " +
-            "    (:status = 'RETURNED' AND b.returnDate IS NOT NULL) OR " +
-            "    (:status = 'NOT_RETURNED' AND b.returnDate IS NULL AND b.borrowDate <= :currentDate) OR " +
-            "    (:status = 'OVERDUE' AND b.returnDate IS NULL AND b.dueDate < :currentDate))")
-    Page<BorrowingDTO> findByUserAndFilters(
-            @Param("user") User user,
-            @Param("keyword") String keyword,
-//          @Param("status") String status,
-            @Param("currentDate") LocalDate currentDate,
-            Pageable pageable);
-
-    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " +
-            "FROM Borrowing b JOIN b.book JOIN b.user " +
-            "WHERE (:keyword IS NULL OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-            "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "WHERE b.user.id = :userId " +
+            "AND ((:keyword IS NULL OR :keyword = '' OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')))) " +
             "AND ((:status IS NULL OR :status = '' OR " +
             "    (:status = 'RETURNED' AND b.returnDate IS NOT NULL) OR " +
             "    (:status = 'NOT_RETURNED' AND b.returnDate IS NULL) OR " +
             "    (:status = 'OVERDUE' AND b.returnDate IS NULL AND b.dueDate < CURRENT_DATE)))")
-    Page<BorrowingDTO> findByFilters(
-            @Param("keyword") String keyword,
-            @Param("status") String status,
-            Pageable pageable);
+    Page<BorrowingDTO> findByFiltersAndUserId(@Param("keyword") String keyword, @Param("status") String status, @Param("userId") Long userId, Pageable pageable);
+
+
+    @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " + "FROM Borrowing b JOIN b.book JOIN b.user " + "WHERE ((:keyword IS NULL OR :keyword = '' OR LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " + "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%')))) " + "AND ((:status IS NULL OR :status = '' OR " + "    (:status = 'RETURNED' AND b.returnDate IS NOT NULL) OR " + "    (:status = 'NOT_RETURNED' AND b.returnDate IS NULL) OR " + "    (:status = 'OVERDUE' AND b.returnDate IS NULL AND b.dueDate < CURRENT_DATE)))")
+    Page<BorrowingDTO> findByFilters(@Param("keyword") String keyword, @Param("status") String status, Pageable pageable);
 
     @Query("SELECT new com.tofftran.mockproject.data.dto.BorrowingDTO(b.id, b.book.id, b.book.title, b.user.id, b.user.name, b.borrowDate, b.returnDate, b.dueDate) " + "FROM Borrowing b JOIN b.book JOIN b.user " + "WHERE LOWER(b.book.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " + "OR LOWER(b.user.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     Page<BorrowingDTO> findByBookTitleOrUserName(@Param("keyword") String keyword, Pageable pageable);

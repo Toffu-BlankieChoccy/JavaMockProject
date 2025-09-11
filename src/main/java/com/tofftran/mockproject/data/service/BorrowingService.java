@@ -114,13 +114,9 @@ public class BorrowingService {
     }
 
 
-    public Page<BorrowingDTO> findByUserWithFilters(Long userId, String keyword, String status, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-        LocalDate currentDate = LocalDate.now();
-        //return borrowingRepository.findByUserAndFilters(user, keyword, status, currentDate, pageable);
-        return borrowingRepository.findByUserAndFilters(user, keyword, currentDate, pageable);
-
+    @Transactional(readOnly = true)
+    public Page<BorrowingDTO> findByFiltersAndUserId(String keyword, String status, Long userId, Pageable pageable){
+        return borrowingRepository.findByFiltersAndUserId(keyword, status, userId, pageable);
     }
 
     //Update (non api)

@@ -8,12 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +23,18 @@ public class BorrowingApiController {
     @Autowired
     private BorrowingService borrowingService;
 
-    // Endpoint cho cả view và AJAX
-    @GetMapping
-    @ResponseBody
-    public String listBorrowings(@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "5") int size,
-                                 @RequestParam(required = false) String search,
-                                 @RequestParam(required = false) String status,
-                                 @RequestParam(required = false) String sort,
-                                 Model model,
-                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith) {
+    @GetMapping // New endpoint for AJAX calls
+    @Transactional(readOnly = true)
+    public ResponseEntity<Map<String, Object>> listBorrowingsAjax(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String sort) {
+
+        // Your existing logic is perfect, just wrap in ResponseEntity
+        page = Math.max(0, page);
+
         Sort sortOrder = Sort.unsorted();
         if (sort != null && !sort.isEmpty()) {
             String[] sortParams = sort.split(",");
@@ -47,59 +49,25 @@ public class BorrowingApiController {
         }
 
         Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
+        Page<BorrowingDTO> borrowingPage;
 
         if ((search != null && !search.trim().isEmpty()) || (status != null && !status.isEmpty())) {
             borrowingPage = borrowingService.findByFilters(search, status, pageable);
-        }
-
-        // Nếu không phải AJAX, trả về view
-        model.addAttribute("borrowings", borrowingPage.getContent());
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", borrowingPage.getTotalPages());
-        model.addAttribute("totalItems", borrowingPage.getTotalElements());
-        model.addAttribute("size", size);
-        model.addAttribute("search", search);
-        model.addAttribute("status", status);
-        model.addAttribute("sort", sort);
-        return "borrowing/apiListTest"; // Trả về template apiListTest.html
-    }
-
-    // Endpoint riêng cho AJAX (tuỳ chọn)
-    @GetMapping("/data")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getBorrowings(@RequestParam(defaultValue = "0") int page,
-                                                             @RequestParam(defaultValue = "5") int size,
-                                                             @RequestParam(required = false) String search,
-                                                             @RequestParam(required = false) String status,
-                                                             @RequestParam(required = false) String sort) {
-        Sort sortOrder = Sort.unsorted();
-        if (sort != null && !sort.isEmpty()) {
-            String[] sortParams = sort.split(",");
-            if (sortParams.length == 2) {
-                sortOrder = Sort.by(sortParams[0]).ascending();
-                if ("desc".equalsIgnoreCase(sortParams[1])) {
-                    sortOrder = Sort.by(sortParams[0]).descending();
-                }
-            }
         } else {
-            sortOrder = Sort.by("id").descending();
-        }
-
-        Pageable pageable = PageRequest.of(page, size, sortOrder);
-        Page<BorrowingDTO> borrowingPage = borrowingService.findAllBorrowings(pageable);
-
-        if ((search != null && !search.trim().isEmpty()) || (status != null && !status.isEmpty())) {
-            borrowingPage = borrowingService.findByFilters(search, status, pageable);
+            borrowingPage = borrowingService.findAllBorrowings(pageable);
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("content", borrowingPage.getContent());
-        response.put("currentPage", borrowingPage.getNumber());
+        response.put("borrowings", borrowingPage.getContent());
+        response.put("currentPage", page);
         response.put("totalPages", borrowingPage.getTotalPages());
         response.put("totalItems", borrowingPage.getTotalElements());
-        response.put("size", borrowingPage.getSize());
+        response.put("size", size);
+        response.put("search", search);
+        response.put("status", status);
+        response.put("sort", sort);
 
+        // Return ResponseEntity for consistent API responses
         return ResponseEntity.ok(response);
     }
 

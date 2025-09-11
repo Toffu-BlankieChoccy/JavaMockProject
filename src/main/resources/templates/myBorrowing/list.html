@@ -4,52 +4,44 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/base}">
 <head>
-    <title>Borrowing List</title>
+    <title>My Borrowings</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <div layout:fragment="content">
     <div class="container">
-        <h1>Borrowings</h1>
+        <h1>My Borrowings</h1>
 
-        <!-- STEP 3A: Convert search form to prevent default submission -->
         <form id="searchForm" class="mb-3">
             <div class="row g-3">
                 <div class="col-auto">
                     <input oninput="searchBorrowings()" type="text" id="searchInput" name="search" class="form-control"
-                           placeholder="Search by user name or book title..."
-                           th:value="${search != null ? search : ''}" aria-label="Search">
-                    <!-- STEP 3B: Change button to call AJAX function -->
-                    <button type="button" onclick="searchBorrowings()" class="btn btn-primary">Search</button>
+                           placeholder="Search by book title..."
+                           aria-label="Search">
                 </div>
 
                 <div class="col-auto">
-                    <!-- STEP 3C: Remove onchange form submit, add AJAX call -->
                     <select id="statusFilter" name="status" class="form-select" onchange="filterByStatus()">
-                        <option value="" th:selected="${status == null}">All</option>
-                        <option value="RETURNED" th:selected="${status == 'RETURNED'}">Returned</option>
-                        <option value="NOT_RETURNED" th:selected="${status == 'NOT_RETURNED'}">Not Returned</option>
-                        <option value="OVERDUE" th:selected="${status == 'OVERDUE'}">Overdue</option>
+                        <option value="">All</option>
+                        <option value="RETURNED">Returned</option>
+                        <option value="NOT_RETURNED">Not Returned</option>
+                        <option value="OVERDUE">Overdue</option>
                     </select>
                 </div>
             </div>
         </form>
 
-        <a th:href="@{/borrowings/add}" class="btn btn-primary mb-3">Add New Borrowing</a>
         <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
-        <!-- STEP 3D: Add loading indicator -->
         <div id="loadingSpinner" style="display: none;" class="text-center">
             <div class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
 
-        <!-- STEP 3E: Wrap table in container for easy updating -->
         <div id="tableContainer">
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <!-- STEP 3F: Convert sort links to AJAX calls -->
                     <th>
                         <a href="javascript:void(0)" onclick="sortTable('id')">
                             ID
@@ -62,13 +54,6 @@
                             Book
                             <span id="sort-book.title-asc" style="display: none;">▲</span>
                             <span id="sort-book.title-desc" style="display: none;">▼</span>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="javascript:void(0)" onclick="sortTable('user.name')">
-                            User
-                            <span id="sort-user.name-asc" style="display: none;">▲</span>
-                            <span id="sort-user.name-desc" style="display: none;">▼</span>
                         </a>
                     </th>
                     <th>
@@ -92,130 +77,87 @@
                             <span id="sort-dueDate-desc" style="display: none;">▼</span>
                         </a>
                     </th>
-                    <th>Actions</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody id="borrowingTableBody">
                 <!-- Table rows will be populated by AJAX -->
-                <tr th:each="borrowing : ${borrowings}">
-                    <td th:text="${borrowing.id}"></td>
-                    <td th:text="${borrowing.bookTitle}"></td>
-                    <td th:text="${borrowing.userName}"></td>
-                    <td th:text="${borrowing.borrowDate}"></td>
-                    <td th:text="${borrowing.returnDate}"></td>
-                    <td th:text="${borrowing.dueDate}"></td>
-                    <td>
-                        <a th:href="@{/borrowings/edit/{id}(id=${borrowing.id})}"
-                           class="btn btn-sm btn-warning">Edit</a>
-                        <a th:href="@{/borrowings/delete/{id}(id=${borrowing.id})}"
-                           class="btn btn-sm btn-danger">Delete</a>
-                        <a th:if="${borrowing.returnDate} == null" class="btn btn-success btn-sm"
-                           th:onclick="|returnBook(${borrowing.id})|">Return</a>
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- STEP 3G: Convert pagination to AJAX -->
         <div id="paginationContainer">
             <!-- Pagination will be populated by AJAX -->
         </div>
 
-        <!-- No result pane -->
         <div id="noResults" class="text-center text-muted" style="display: none;">No results found.</div>
 
-        <!-- STEP 4: AJAX JavaScript Functions -->
         <script>
-            // Global variables to track current state
             let currentPage = 0;
             let currentSize = 5;
             let currentSearch = '';
             let currentStatus = '';
             let currentSort = '';
 
-            // STEP 4A: Initialize from Thymeleaf values
             document.addEventListener('DOMContentLoaded', function() {
-                currentPage = [[${currentPage}]] || 0;
-                currentSize = [[${size}]] || 5;
-                currentSearch = '[[${search}]]' || '';
-                currentStatus = '[[${status}]]' || '';
-                currentSort = '[[${sort}]]' || '';
-
-                // Set initial form values
-                document.getElementById('searchInput').value = currentSearch;
-                document.getElementById('statusFilter').value = currentStatus;
-
-                updateSortIndicators();
                 loadBorrowings();
             });
 
-            // STEP 4B: Main function to load borrowings via AJAX
             function loadBorrowings(page = currentPage, size = currentSize, search = currentSearch, status = currentStatus, sort = currentSort) {
-                // Show loading spinner
                 document.getElementById('loadingSpinner').style.display = 'block';
                 document.getElementById('tableContainer').style.display = 'none';
 
-                // Build URL with parameters
                 const params = new URLSearchParams();
                 if (page !== null) params.append('page', page);
                 if (size !== null) params.append('size', size);
-                if (search) params.append('search', search);
+                params.append('search', search || '');
                 if (status) params.append('status', status);
                 if (sort) params.append('sort', sort);
 
-                // Make AJAX call to your API endpoint
-                fetch('/api/borrowings?' + params.toString())
-                    .then(response => response.json())
+                // API endpoint cho my-borrowings
+                fetch('/api/my-borrowings?' + params.toString())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        // Update global state
                         currentPage = data.currentPage;
                         currentSize = data.size;
                         currentSearch = data.search || '';
                         currentStatus = data.status || '';
                         currentSort = data.sort || '';
 
-                        // Update the table
                         updateTable(data.borrowings);
-
-                        // Update pagination
                         updatePagination(data);
-
-                        // Update sort indicators
                         updateSortIndicators();
 
-                        // Hide loading, show table
                         document.getElementById('loadingSpinner').style.display = 'none';
                         document.getElementById('tableContainer').style.display = 'block';
-
-                        // Show/hide no results message
                         document.getElementById('noResults').style.display = data.borrowings.length === 0 ? 'block' : 'none';
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        document.getElementById('errorMessage').textContent = 'Failed to load data';
+                        document.getElementById('errorMessage').textContent = 'Failed to load data: ' + error.message;
                         document.getElementById('errorMessage').style.display = 'block';
                         document.getElementById('loadingSpinner').style.display = 'none';
                     });
             }
 
-            // STEP 4C: Search function
             function searchBorrowings() {
                 const searchValue = document.getElementById('searchInput').value;
                 loadBorrowings(0, currentSize, searchValue, currentStatus, currentSort);
             }
 
-            // STEP 4D: Filter function
             function filterByStatus() {
                 const statusValue = document.getElementById('statusFilter').value;
-                loadBorrowings(0, currentSize, currentSearch, statusValue, currentSort);
+                const searchValue = currentSearch || '';
+                loadBorrowings(0, currentSize, searchValue, statusValue, currentSort);
             }
 
-            // STEP 4E: Sort function
             function sortTable(field) {
                 let newSort = field + ',asc';
-
-                // Toggle sort direction if same field
                 if (currentSort && currentSort.startsWith(field)) {
                     if (currentSort.endsWith('asc')) {
                         newSort = field + ',desc';
@@ -223,41 +165,42 @@
                         newSort = field + ',asc';
                     }
                 }
-
                 loadBorrowings(currentPage, currentSize, currentSearch, currentStatus, newSort);
             }
 
-            // STEP 4F: Pagination function
             function goToPage(page) {
                 loadBorrowings(page, currentSize, currentSearch, currentStatus, currentSort);
             }
 
-            // STEP 4G: Update table content
             function updateTable(borrowings) {
                 const tbody = document.getElementById('borrowingTableBody');
                 tbody.innerHTML = '';
 
                 borrowings.forEach(borrowing => {
+                    // Determine status
+                    let statusBadge = '';
+                    if (borrowing.returnDate) {
+                        statusBadge = '<span class="badge bg-success">Returned</span>';
+                    } else if (borrowing.dueDate && new Date(borrowing.dueDate) < new Date()) {
+                        statusBadge = '<span class="badge bg-danger">Overdue</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-warning">Not Returned</span>';
+                    }
+
                     const row = `
                         <tr>
                             <td>${borrowing.id}</td>
                             <td>${borrowing.bookTitle}</td>
-                            <td>${borrowing.userName}</td>
                             <td>${borrowing.borrowDate}</td>
-                            <td>${borrowing.returnDate || ''}</td>
-                            <td>${borrowing.dueDate || ''}</td>
-                            <td>
-                                <a href="/borrowings/edit/${borrowing.id}" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="/borrowings/delete/${borrowing.id}" class="btn btn-sm btn-danger">Delete</a>
-                                ${!borrowing.returnDate ? `<button class="btn btn-success btn-sm" onclick="returnBook(${borrowing.id})">Return</button>` : ''}
-                            </td>
+                            <td>${borrowing.returnDate || 'Not returned'}</td>
+                            <td>${borrowing.dueDate || 'No due date'}</td>
+                            <td>${statusBadge}</td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
             }
 
-            // STEP 4H: Update pagination
             function updatePagination(data) {
                 const container = document.getElementById('paginationContainer');
                 if (data.totalPages <= 1) {
@@ -293,12 +236,8 @@
                 container.innerHTML = paginationHtml;
             }
 
-            // STEP 4I: Update sort indicators
             function updateSortIndicators() {
-                // Hide all sort indicators
                 document.querySelectorAll('[id^="sort-"]').forEach(el => el.style.display = 'none');
-
-                // Show current sort indicator
                 if (currentSort) {
                     const [field, direction] = currentSort.split(',');
                     const indicator = document.getElementById(`sort-${field}-${direction}`);
@@ -308,33 +247,11 @@
                 }
             }
 
-            // STEP 4J: Enhanced return book function
-            function returnBook(id) {
-                if (confirm('Are you sure you want to return this book?')) {
-                    fetch('/api/borrowings/' + id + '/return', {
-                        method: 'PUT'
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Book returned successfully!');
-                        // Reload current page instead of full page refresh
-                        loadBorrowings();
-                    })
-                    .catch(error => {
-                        alert('Failed to return book.');
-                        console.error('Error:', error);
-                    });
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchBorrowings();
                 }
-            }
-
-            // STEP 4K: Allow Enter key to trigger search
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        searchBorrowings();
-                    }
-                });
             });
         </script>
     </div>
