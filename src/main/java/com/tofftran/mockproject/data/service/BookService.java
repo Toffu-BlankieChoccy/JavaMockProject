@@ -60,6 +60,7 @@ public class BookService {
         book.setUpdatedOn(Instant.now());
         book.setPublishedDate(bookDetails.getPublishedDate());
         book.setPrice(bookDetails.getPrice());
+        book.setAvailable(bookDetails.isAvailable());
         return bookRepository.save(book);
     }
 

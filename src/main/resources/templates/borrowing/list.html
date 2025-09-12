@@ -18,8 +18,6 @@
                     <input oninput="searchBorrowings()" type="text" id="searchInput" name="search" class="form-control"
                            placeholder="Search by user name or book title..."
                            th:value="${search != null ? search : ''}" aria-label="Search">
-                    <!-- STEP 3B: Change button to call AJAX function -->
-                    <button type="button" onclick="searchBorrowings()" class="btn btn-primary">Search</button>
                 </div>
 
                 <div class="col-auto">

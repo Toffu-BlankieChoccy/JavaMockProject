@@ -46,7 +46,7 @@ public class Book {
     @PositiveOrZero(message = "Price must be a positive number")
     private double price;
 
-  @Column(nullable = true) // Temp null
+    @NotNull(message = "Availability must be set")
     private boolean isAvailable;
 
     private Instant createdOn;
