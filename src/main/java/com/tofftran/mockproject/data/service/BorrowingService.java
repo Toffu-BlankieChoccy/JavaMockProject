@@ -106,10 +106,7 @@ public class BorrowingService {
 
     //Filters
     @Transactional(readOnly = true)
-//1    public Page<BorrowingDTO> findByFilters(String keyword, LocalDate startDate, LocalDate endDate, String status, Pageable pageable) {
     public Page<BorrowingDTO> findByFilters(String keyword, String status, Pageable pageable) {
-
-//1        return borrowingRepository.findByFilters(keyword, startDate, endDate, status,pageable);
         return borrowingRepository.findByFilters(keyword, status,pageable);
     }
 
