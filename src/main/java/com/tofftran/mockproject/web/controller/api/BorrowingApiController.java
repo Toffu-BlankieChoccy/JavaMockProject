@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,13 +83,29 @@ public class BorrowingApiController {
     }
 
 
+//    @PutMapping("/{id}/return")
+//    public ResponseEntity<BorrowingDTO> returnBook(@PathVariable Long id) {
+//        try {
+//            BorrowingDTO borrowing = borrowingService.returnBook(id);
+//            return ResponseEntity.ok(borrowing);
+//        } catch (IllegalStateException e) {
+//            return ResponseEntity.badRequest().body(null);
+//        }
+//    }
+
     @PutMapping("/{id}/return")
-    public ResponseEntity<BorrowingDTO> returnBook(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> returnBook(@PathVariable Long id) {
         try {
-            BorrowingDTO borrowing = borrowingService.returnBook(id);
-            return ResponseEntity.ok(borrowing);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(null);
+            borrowingService.returnBook(id);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Book returned successfully");
+            return ResponseEntity.ok(response);  // Trả về Map có success=true
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to return book: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

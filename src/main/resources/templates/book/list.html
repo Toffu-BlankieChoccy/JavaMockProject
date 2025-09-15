@@ -29,7 +29,7 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>
+                <th class="text-center">
                     <a th:href="@{/books(page=${currentPage}, size=${size}, search=${search}, sort='id,' + (${sort != null and sort.startsWith('id') and sort.endsWith('asc')} ? 'desc' : 'asc'))}">
                         ID
                         <span th:if="${sort != null and sort.startsWith('id') and sort.endsWith('asc')}">▲</span>
@@ -64,17 +64,17 @@
                         <span th:if="${sort != null and sort.startsWith('price') and sort.endsWith('desc')}">▼</span>
                     </a>
                 </th>
-                <th>Actions</th>
+                <th class="text-center">Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="book : ${books}">
-                <td th:text="${book.id}"></td>
+                <td class="text-center" th:text="${book.id}"></td>
                 <td th:text="${book.title}"></td>
                 <td th:text="${book.isbn}"></td>
                 <td th:text="${#temporals.format(book.publishedDate, 'dd-MM-yyyy')}"></td>
                 <td th:text="${#numbers.formatDecimal(book.price, 2, 2)}"></td>
-                <td>
+                <td class="text-center">
                     <div sec:authorize="hasRole('ADMIN')">
                         <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-sm btn-warning">Edit</a>
                         <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-sm btn-danger">Delete</a>

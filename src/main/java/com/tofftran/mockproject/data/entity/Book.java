@@ -33,6 +33,16 @@ public class Book {
     @Size(min = 2, max = 100, message = "Title must between 2 - 100 characters")
     private String title;
 
+    // Cloudinary specific fields
+    @Column(name = "image_public_id")
+    private String imagePublicId; // Cloudinary's unique identifier
+
+    @Column(name = "image_url")
+    private String imageUrl; // Full Cloudinary URL
+
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl; // Optimized thumbnail URL
+
     @NotNull(message = "ISBN cannot be null")
     @Size(min = 10, max = 13, message = "ISBN must between 10 to 13 characters")
     @Column(unique = true)

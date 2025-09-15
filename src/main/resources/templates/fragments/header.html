@@ -11,9 +11,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <li class="nav-item">
                     <a class="nav-link" th:classappend="${@route.isActive('/books') ? 'active' : ''}"
                        th:href="@{/books}">Books</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('USER')">
+                    <a class="nav-link" th:classappend="${@route.isActive('/myBorrowings') ? 'active' : ''}"
+                       th:href="@{/myBorrowings}">Borrowed Books</a>
                 </li>
                 <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link" th:classappend="${@route.isActive('/users') ? 'active' : ''}"

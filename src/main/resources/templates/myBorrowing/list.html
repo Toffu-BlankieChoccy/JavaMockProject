@@ -42,7 +42,7 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>
+                    <th class="text-center">
                         <a href="javascript:void(0)" onclick="sortTable('id')">
                             ID
                             <span id="sort-id-asc" style="display: none;">▲</span>
@@ -77,7 +77,7 @@
                             <span id="sort-dueDate-desc" style="display: none;">▼</span>
                         </a>
                     </th>
-                    <th>Status</th>
+                    <th class="text-center">Status</th>
                 </tr>
                 </thead>
                 <tbody id="borrowingTableBody">
@@ -189,12 +189,12 @@
 
                     const row = `
                         <tr>
-                            <td>${borrowing.id}</td>
+                            <td class="text-center">${borrowing.id}</td>
                             <td>${borrowing.bookTitle}</td>
                             <td>${borrowing.borrowDate}</td>
                             <td>${borrowing.returnDate || 'Not returned'}</td>
                             <td>${borrowing.dueDate || 'No due date'}</td>
-                            <td>${statusBadge}</td>
+                            <td class="text-center">${statusBadge}</td>
                         </tr>
                     `;
                     tbody.innerHTML += row;

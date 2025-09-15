@@ -35,24 +35,33 @@
         <!-- Error Message -->
         <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
-        <!-- Loading Spinner -->
-        <div id="loadingSpinner" style="display: none;" class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-        </div>
 
         <!-- Table Container -->
         <div id="tableContainer">
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th><a href="javascript:void(0)" onclick="sortTable('id')">ID <span id="sort-id-asc" style="display: none;">▲</span><span id="sort-id-desc" style="display: none;">▼</span></a></th>
-                    <th><a href="javascript:void(0)" onclick="sortTable('book.title')">Book <span id="sort-book.title-asc" style="display: none;">▲</span><span id="sort-book.title-desc" style="display: none;">▼</span></a></th>
-                    <th><a href="javascript:void(0)" onclick="sortTable('user.name')">User <span id="sort-user.name-asc" style="display: none;">▲</span><span id="sort-user.name-desc" style="display: none;">▼</span></a></th>
-                    <th><a href="javascript:void(0)" onclick="sortTable('borrowDate')">Borrow Date <span id="sort-borrowDate-asc" style="display: none;">▲</span><span id="sort-borrowDate-desc" style="display: none;">▼</span></a></th>
-                    <th><a href="javascript:void(0)" onclick="sortTable('returnDate')">Return Date <span id="sort-returnDate-asc" style="display: none;">▲</span><span id="sort-returnDate-desc" style="display: none;">▼</span></a></th>
-                    <th><a href="javascript:void(0)" onclick="sortTable('dueDate')">Due Date <span id="sort-dueDate-asc" style="display: none;">▲</span><span id="sort-dueDate-desc" style="display: none;">▼</span></a></th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('id')">ID <span id="sort-id-asc"
+                                                                                        style="display: none;">▲</span><span
+                            id="sort-id-desc" style="display: none;">▼</span></a></th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('book.title')">Book <span
+                            id="sort-book.title-asc" style="display: none;">▲</span><span id="sort-book.title-desc"
+                                                                                          style="display: none;">▼</span></a>
+                    </th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('user.name')">User <span id="sort-user.name-asc"
+                                                                                                 style="display: none;">▲</span><span
+                            id="sort-user.name-desc" style="display: none;">▼</span></a></th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('borrowDate')">Borrow Date <span
+                            id="sort-borrowDate-asc" style="display: none;">▲</span><span id="sort-borrowDate-desc"
+                                                                                          style="display: none;">▼</span></a>
+                    </th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('returnDate')">Return Date <span
+                            id="sort-returnDate-asc" style="display: none;">▲</span><span id="sort-returnDate-desc"
+                                                                                          style="display: none;">▼</span></a>
+                    </th>
+                    <th><a href="javascript:void(0)" onclick="sortTable('dueDate')">Due Date <span id="sort-dueDate-asc"
+                                                                                                   style="display: none;">▲</span><span
+                            id="sort-dueDate-desc" style="display: none;">▼</span></a></th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -60,6 +69,12 @@
                 <!-- Table rows populated by AJAX -->
                 </tbody>
             </table>
+        </div>
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" style="display: none;" class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
 
         <!-- Pagination Container -->
@@ -265,13 +280,13 @@
         // Utility functions
         function showLoading() {
             document.getElementById('loadingSpinner').style.display = 'block';
-            document.getElementById('tableContainer').style.display = 'none';
+        //    document.getElementById('tableContainer').style.display = 'none';
             hideError();
         }
 
         function hideLoading() {
             document.getElementById('loadingSpinner').style.display = 'none';
-            document.getElementById('tableContainer').style.display = 'block';
+        //    document.getElementById('tableContainer').style.display = 'block';
         }
 
         function showError(message) {
