@@ -8,21 +8,18 @@ import com.tofftran.mockproject.data.service.BookService;
 import com.tofftran.mockproject.data.service.BorrowingService;
 import com.tofftran.mockproject.data.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @Controller
 @RequestMapping("/borrowings")
+@PreAuthorize("hasRole('ADMIN')")
 public class BorrowingController {
     private final BookService bookService;
     private final UserService userService;

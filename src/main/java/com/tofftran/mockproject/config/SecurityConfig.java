@@ -26,6 +26,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/**", "/auth/register", "/auth/login", "/").permitAll()
                                 .requestMatchers("/books/**").authenticated()
                                 .requestMatchers("/user/**").authenticated()
+                                .requestMatchers("/borrowings/**").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .formLogin(formLogin ->
